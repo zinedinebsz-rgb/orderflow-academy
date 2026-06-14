@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="fr"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orderflow Academy — de zéro à trader order flow rentable</title>
+<meta name="description" content="Formation order flow complète et gratuite : Auction Market Theory, Volume Profile, DOM, footprint/delta, confluence, stratégie ES rentable, gestion du risque, prop firm, examen certifiant. La vérité statistique incluse.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07080C; --srf:#0D0F16; --srf2:#11141D; --srf3:#161A26;
+  --line:rgba(255,255,255,.07); --line2:rgba(255,255,255,.13);
+  --txt:#E7EAF2; --dim:#7B849D; --dim2:#9aa3bd;
+  --acc:#6E7CFF; --acc-d:#5563e6; --cyan:#38BDF8; --grn:#34D399; --red:#FB7185; --gold:#FBBF24;
+  --sb:300px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--cyan);text-decoration:none} a:hover{text-decoration:underline}
+::selection{background:rgba(110,124,255,.35)}
+/* scrollbar */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:#1d2230;border-radius:8px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ===== top bar ===== */
+.top{position:fixed;top:0;left:0;right:0;height:56px;z-index:50;background:rgba(7,8,12,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 18px}
+.brand{font-weight:900;letter-spacing:.04em;font-size:14px;white-space:nowrap}
+.brand b{color:var(--acc)}
+.top .prog{flex:1;max-width:420px;height:8px;background:var(--srf2);border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.top .prog>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--cyan));transition:width .5s}
+.top .pct{font-size:12px;color:var(--dim);min-width:96px;text-align:right;white-space:nowrap}
+.burger{display:none;background:var(--srf2);border:1px solid var(--line2);color:var(--txt);width:38px;height:34px;border-radius:9px;font-size:17px;cursor:pointer}
+
+/* ===== layout ===== */
+.layout{display:flex;min-height:100vh;padding-top:56px}
+aside{position:fixed;top:56px;bottom:0;left:0;width:var(--sb);overflow-y:auto;border-right:1px solid var(--line);background:var(--srf);padding:16px 12px 60px}
+main{margin-left:var(--sb);flex:1;min-width:0;padding:34px clamp(18px,4vw,56px) 100px;max-width:980px}
+.navgroup{margin:14px 0 6px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);padding:0 10px;font-weight:700}
+.navlink{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;color:var(--dim2);font-size:13.5px;cursor:pointer;border:1px solid transparent;line-height:1.3}
+.navlink:hover{background:var(--srf2);color:var(--txt)}
+.navlink.active{background:rgba(110,124,255,.12);border-color:rgba(110,124,255,.35);color:#fff}
+.navlink .ix{flex:0 0 22px;height:22px;border-radius:6px;background:var(--srf2);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--dim)}
+.navlink.active .ix{background:var(--acc);color:#07080c;border-color:var(--acc)}
+.navlink.done .ix{background:var(--grn);color:#07080c;border-color:var(--grn)}
+.navlink .ic{font-size:15px;width:22px;text-align:center}
+
+/* ===== content ===== */
+.page{display:none;animation:fade .35s ease}
+.page.show{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.kicker{display:inline-block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);font-weight:800;border:1px solid var(--line2);padding:5px 11px;border-radius:999px}
+h1{font-size:clamp(30px,4.6vw,46px);font-weight:900;line-height:1.08;letter-spacing:-.02em;margin:16px 0 12px}
+h2{font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.01em;margin:34px 0 8px}
+h3{font-size:19px;font-weight:700;margin:26px 0 6px}
+h4{font-size:15.5px;font-weight:700;margin:18px 0 4px}
+p{margin:11px 0;color:#cdd3e0}
+.lead{font-size:17.5px;color:var(--dim2);max-width:72ch}
+ul,ol{margin:11px 0;padding-left:22px;color:#cdd3e0}
+li{margin:7px 0}
+strong{color:var(--txt)}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+.muted{color:var(--dim)}
+
+.card{background:var(--srf);border:1px solid var(--line2);border-radius:16px;padding:20px 22px;margin:16px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+.fig{background:var(--srf2);border:1px solid var(--line);border-radius:14px;padding:16px;margin:16px 0}
+.fig svg{width:100%;height:auto;display:block}
+.cap{font-size:12.5px;color:var(--dim);margin-top:9px;text-align:center}
+.stat{background:var(--srf2);border:1px solid var(--line2);border-radius:14px;padding:16px}
+.stat .v{font-size:26px;font-weight:800}
+.stat .l{font-size:12.5px;color:var(--dim);margin-top:2px}
+
+.callout{border-left:3px solid var(--acc);background:linear-gradient(90deg,rgba(110,124,255,.09),transparent);padding:13px 17px;border-radius:0 12px 12px 0;margin:16px 0}
+.callout.grn{border-color:var(--grn);background:linear-gradient(90deg,rgba(52,211,153,.09),transparent)}
+.callout.gold{border-color:var(--gold);background:linear-gradient(90deg,rgba(251,191,36,.09),transparent)}
+.callout.red{border-color:var(--red);background:linear-gradient(90deg,rgba(251,113,133,.09),transparent)}
+.callout b{display:block;margin-bottom:3px;font-size:12.5px;letter-spacing:.03em}
+.pill{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--txt);background:var(--srf2);border:1px solid var(--line2);padding:5px 11px;border-radius:999px;margin:3px 4px 3px 0}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--dim);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--acc);color:#07080c;border:0;font-weight:700;font-size:14.5px;padding:11px 18px;border-radius:11px;cursor:pointer;font-family:inherit;transition:.15s}
+.btn:hover{background:#8390ff;text-decoration:none}
+.btn.ghost{background:var(--srf2);color:var(--txt);border:1px solid var(--line2)}
+.btn.ghost:hover{border-color:var(--acc);background:var(--srf3)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:18px 0}
+input,select{font-family:inherit;font-size:14px;background:var(--srf2);border:1px solid var(--line2);color:var(--txt);border-radius:10px;padding:10px 12px;width:100%}
+input:focus,select:focus{outline:none;border-color:var(--acc)}
+label{font-size:12.5px;color:var(--dim);display:block;margin-bottom:5px}
+.field{margin:10px 0}
+
+/* quiz */
+.quiz{margin-top:14px}
+.q{background:var(--srf);border:1px solid var(--line2);border-radius:14px;padding:16px 18px;margin:12px 0}
+.q .qt{font-weight:600;margin-bottom:10px}
+.opt{display:block;width:100%;text-align:left;background:var(--srf2);border:1px solid var(--line2);color:var(--txt);border-radius:10px;padding:10px 13px;margin:7px 0;cursor:pointer;font-family:inherit;font-size:14px;transition:.12s}
+.opt:hover{border-color:var(--acc)}
+.opt.correct{border-color:var(--grn);background:rgba(52,211,153,.14)}
+.opt.wrong{border-color:var(--red);background:rgba(251,113,133,.14)}
+.opt.dim{opacity:.5}
+.explain{font-size:13.5px;color:var(--dim2);margin-top:8px;padding-left:12px;border-left:2px solid var(--line2);display:none}
+.explain.show{display:block}
+
+.modfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:30px;padding-top:22px;border-top:1px solid var(--line);flex-wrap:wrap}
+.badge-done{display:inline-flex;align-items:center;gap:7px;color:var(--grn);font-weight:700;font-size:14px}
+
+/* hero home */
+.hero-card{background:radial-gradient(120% 140% at 0% 0%,rgba(110,124,255,.14),transparent 55%),var(--srf);border:1px solid var(--line2);border-radius:20px;padding:30px}
+.feat{display:flex;gap:11px;align-items:flex-start;margin:10px 0}
+.feat .fi{font-size:18px}
+
+/* exam / certificate */
+.cert{background:linear-gradient(135deg,#0e1322,#0a0c14);border:1px solid var(--acc);border-radius:18px;padding:34px;text-align:center;margin:20px 0}
+.cert .seal{font-size:40px}
+.cert h2{margin:8px 0}
+.cert .name{font-size:28px;font-weight:800;color:var(--acc);margin:6px 0}
+
+/* replay trainer */
+.rp-stage{background:var(--srf2);border:1px solid var(--line2);border-radius:14px;padding:16px}
+.bars{display:flex;align-items:flex-end;gap:6px;height:220px;padding:10px;background:linear-gradient(180deg,#0a0d15,#0c0f18);border-radius:10px;overflow:hidden}
+.bars .b{flex:1;display:flex;flex-direction:column;justify-content:flex-end;position:relative}
+.bars .wick{width:2px;margin:0 auto;background:var(--dim)}
+.bars .body{width:70%;margin:0 auto;border-radius:2px}
+
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--srf3);border:1px solid var(--line2);color:var(--txt);padding:12px 18px;border-radius:12px;font-size:14px;z-index:80;opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1}
+
+@media(max-width:900px){
+  :root{--sb:0px}
+  aside{transform:translateX(-100%);transition:.25s;width:280px;z-index:60;box-shadow:0 0 40px rgba(0,0,0,.5)}
+  aside.open{transform:none}
+  main{margin-left:0}
+  .burger{display:block}
+  .scrim{position:fixed;inset:56px 0 0 0;background:rgba(0,0,0,.5);z-index:55;display:none}
+  .scrim.show{display:block}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <button class="burger" id="burger" aria-label="Menu">☰</button>
+  <div class="brand">⟆ Orderflow<b>*</b>Academy</div>
+  <div class="prog"><i id="progBar"></i></div>
+  <div class="pct" id="progPct">0 / 0 modules</div>
+</div>
+
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="scrim" id="scrim"></div>
+  <main id="main"></main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =================================================================
+   ORDERFLOW ACADEMY — moteur
+   ================================================================= */
+const LS='ofa_v1';
+const store={
+  get(){try{return JSON.parse(localStorage.getItem(LS))||{}}catch(e){return{}}},
+  set(o){localStorage.setItem(LS,JSON.stringify(o))},
+  done:{}, // filled below
+};
+let STATE=store.get();
+if(!STATE.completed)STATE.completed={};
+if(!STATE.journal)STATE.journal=[];
+function save(){store.set(STATE)}
+
+/* ---- data placeholders (injected) ---- */
+const MODULES = [
+{id:'m1',num:1,title:'La vérité chiffrée',subtitle:"Avant toute technique : pourquoi la plupart échouent, et ce que cette formation est — et n'est pas.",
+html:`
+<p>97 % des particuliers qui tradent avec effet de levier perdent de l'argent sur la durée. Ce n'est pas un slogan : c'est ce que montrent les rapports réglementaires obligatoires des brokers européens (les fameux « XX % des comptes CFD perdent »). La première compétence d'un trader n'est pas de gagner — c'est de <strong>comprendre pourquoi les autres perdent</strong> pour ne pas faire pareil.</p>
+<h3>Les 4 vraies causes de l'échec</h3>
+<ul>
+<li><strong>Pas d'edge mesuré.</strong> Trader « au feeling » sur des indicateurs en retard. Sans statistique, on ne sait même pas si on a un avantage.</li>
+<li><strong>Mauvais money management.</strong> Risquer trop par trade, pas de stop, doubler après une perte. Une seule erreur de sizing efface 50 trades gagnants.</li>
+<li><strong>Indiscipline.</strong> Connaître les règles et ne pas les suivre. Le marché paie la patience, pas l'activité.</li>
+<li><strong>Sous-capitalisation + impatience.</strong> Vouloir vivre du trading en 3 mois avec 500 €. La prop firm répond en partie à ça (module 13).</li>
+</ul>
+<div class="callout grn"><b>L'angle order flow</b>La plupart des formations vendent des « zones magiques ». Ici on apprend à lire <strong>l'enchère elle-même</strong> : qui achète, qui vend, où le volume se concentre, où le prix est rejeté. C'est la donnée la plus proche de la vérité du marché — pas un indicateur dérivé du prix passé.</div>
+<h3>Ce que cette formation est… et n'est pas</h3>
+<div class="grid2">
+<div class="card"><h4 style="margin-top:0;color:var(--grn)">C'est</h4><ul><li>Une méthode mécanique, chiffrée, testée.</li><li>Un cadre de risque strict.</li><li>Un entraînement à la lecture du marché.</li><li>Honnête sur les pertes (mois rouges inclus).</li></ul></div>
+<div class="card"><h4 style="margin-top:0;color:var(--red)">Ce n'est pas</h4><ul><li>Une promesse de richesse rapide.</li><li>Un signal à copier sans comprendre.</li><li>Un Graal qui gagne à 90 %.</li><li>Un substitut à 90 jours de pratique en démo.</li></ul></div>
+</div>
+<div class="callout"><b>Objectif de fin de parcours</b>Savoir lire un déséquilibre order flow, exécuter une stratégie ES à espérance positive, gérer ton risque, et tenir un compte prop firm. Mesurable : &gt; 60 % de bonne lecture au trainer, &gt; 90 % de « plan respecté » dans ton journal, examen final réussi.</div>
+`,
+quiz:[
+{q:"Quelle est, statistiquement, la priorité n°1 d'un débutant ?",options:["Trouver l'indicateur qui gagne le plus","Comprendre pourquoi la majorité perd et gérer le risque","Trader le plus souvent possible pour apprendre vite"],answer:1,explain:"Sans gestion du risque et sans edge mesuré, la fréquence ne fait qu'accélérer les pertes."},
+{q:"Pourquoi l'order flow plutôt que les indicateurs classiques ?",options:["Parce que c'est plus à la mode","Parce qu'il décrit l'enchère réelle (acheteurs/vendeurs, volume) et non un dérivé du prix passé","Parce qu'il garantit de gagner"],answer:1,explain:"L'order flow est la donnée la plus proche de la mécanique réelle du marché ; aucun outil ne garantit de gagner."},
+{q:"Un perdant 'bien exécuté' (plan respecté, stop pris) est…",options:["Une faute à éviter à tout prix","Une bonne décision : sur un edge à faible win rate, les pertes font partie du plan","La preuve que la stratégie est mauvaise"],answer:1,explain:"Une stratégie à gros R/R perd souvent ; ce qui compte est l'espérance sur la durée et la discipline d'exécution."}
+]},
+
+{id:'m2',num:2,title:"Comment fonctionne vraiment un marché",subtitle:"Futures, ES/US500, cotation, liquidité, sessions : le terrain de jeu.",
+html:`
+<p>Un marché, c'est un lieu où des acheteurs et des vendeurs se rencontrent pour échanger un actif à un prix. Sur les marchés cotés en continu (futures indiciels, forex…), ce processus tourne en permanence : à chaque instant, le meilleur acheteur (best bid) et le meilleur vendeur (best ask) fixent une fourchette, et une transaction a lieu dès qu'un ordre traverse cette fourchette.</p>
+<h3>Pourquoi les futures indiciels (ES / US500)</h3>
+<ul>
+<li><strong>Liquidité énorme et centralisée.</strong> Le ES (E-mini S&amp;P 500, CME) est l'un des contrats les plus échangés au monde : le carnet d'ordres reflète de vrais flux, idéal pour l'order flow.</li>
+<li><strong>Données order flow disponibles.</strong> DOM, footprint, delta, volume profile sont fiables car le volume est réel et centralisé (contrairement au forex décentralisé).</li>
+<li><strong>Tailles adaptées.</strong> MES (micro, 5 $/pt) pour s'entraîner petit, ES (50 $/pt) pour le capital prop firm.</li>
+</ul>
+<h3>Le vocabulaire qui compte</h3>
+<div class="card">
+<table>
+<tr><th>Terme</th><th>Sens</th></tr>
+<tr><td><strong>Tick</strong></td><td>Le plus petit incrément de prix. Sur ES, 1 tick = 0,25 point = 12,50 $/contrat.</td></tr>
+<tr><td><strong>Point</strong></td><td>4 ticks sur ES = 50 $/contrat. Un stop de 8 points = 400 $/contrat.</td></tr>
+<tr><td><strong>Bid / Ask</strong></td><td>Meilleur prix acheteur / vendeur. L'écart = le spread.</td></tr>
+<tr><td><strong>Market order</strong></td><td>Ordre qui prend la liquidité immédiatement (traverse le spread) = agressif.</td></tr>
+<tr><td><strong>Limit order</strong></td><td>Ordre posté dans le carnet, en attente = passif (fournit la liquidité).</td></tr>
+<tr><td><strong>Liquidité</strong></td><td>La quantité d'ordres en attente. Beaucoup de liquidité = prix stable ; vide de liquidité = mouvements rapides.</td></tr>
+</table>
+</div>
+<h3>Les sessions (heure de Paris)</h3>
+<p>Le ES se trade quasi 24h/24, mais l'action utile se concentre sur la <strong>session US (cash open à 15h30, heure de Paris)</strong>. C'est l'ouverture de Wall Street : volume maximal, vrais déséquilibres, c'est là que notre stratégie opère. L'overnight (Asie/Europe) sert surtout à situer la valeur de la veille (POC, VAH/VAL — modules 3-4).</p>
+<div class="callout gold"><b>Retiens</b>Le prix bouge parce qu'un côté <em>traverse le spread</em> (market orders) plus fort que l'autre ne le défend (limit orders). Tout l'order flow consiste à voir qui gagne ce bras de fer, en direct.</div>
+`,
+quiz:[
+{q:"Sur ES, combien vaut 1 point ?",options:["12,50 $","50 $","250 $"],answer:1,explain:"1 point = 4 ticks ; 1 tick = 12,50 $ ; donc 1 point = 50 $/contrat. (MES = 5 $/pt.)"},
+{q:"Qui fait bouger le prix ?",options:["Les ordres limites en attente","Les market orders qui traversent le spread plus fort d'un côté","Les indicateurs techniques"],answer:1,explain:"Le prix se déplace quand l'agression (market orders) d'un côté dépasse la défense (limites) de l'autre."},
+{q:"Pourquoi trader le ES en order flow plutôt que le forex ?",options:["Le ES a un volume réel et centralisé, fiable pour le DOM/footprint","Le forex est interdit","Le ES gagne toujours"],answer:0,explain:"Le forex est décentralisé : pas de vrai volume consolidé. Le ES offre des données order flow fiables."}
+]},
+
+{id:'m3',num:3,title:"Auction Market Theory (AMT)",subtitle:"Le cœur conceptuel : le marché est une enchère permanente qui cherche le prix juste.",
+html:`
+<p>L'Auction Market Theory explique que les marchés fonctionnent comme une <strong>enchère continue</strong>. Acheteurs et vendeurs interagissent en permanence pour trouver un <strong>prix juste</strong> (fair price). Le prix bouge quand il y a un <strong>déséquilibre entre l'offre et la demande</strong> — pas à cause de « zones » dessinées arbitrairement. Plus de pression acheteuse → ça monte ; plus de pression vendeuse → ça descend.</p>
+<div class="callout"><b>Idée clé</b>Le marché cherche toujours l'équilibre (l'acceptation). Si l'équilibre est rompu (déséquilibre), le prix se déplace vite pour découvrir une nouvelle zone d'équilibre, ou revient vers l'équilibre précédent. Pourquoi ? Au prix juste, le maximum de transactions se font : le marché cherche à être <strong>le plus efficient possible</strong>.</div>
+<div class="grid2">
+<div class="fig"><svg viewBox="0 0 380 230" role="img" aria-label="Cycle de l'AMT"><defs><marker id="ar1" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7B849D"/></marker></defs><circle cx="105" cy="115" r="58" fill="none" stroke="#34D399" stroke-width="2"/><text x="105" y="108" text-anchor="middle" fill="#34D399" font-size="13" font-weight="700">Fair Value</text><text x="105" y="125" text-anchor="middle" fill="#E7EAF2" font-size="11">Offre = Demande</text><text x="105" y="139" text-anchor="middle" fill="#7B849D" font-size="10">volume élevé</text><circle cx="275" cy="115" r="58" fill="none" stroke="#FB7185" stroke-width="2"/><text x="275" y="108" text-anchor="middle" fill="#FB7185" font-size="13" font-weight="700">Déséquilibre</text><text x="275" y="125" text-anchor="middle" fill="#E7EAF2" font-size="11">un côté domine</text><text x="275" y="139" text-anchor="middle" fill="#7B849D" font-size="10">volume faible</text><path d="M150,80 C185,55 195,55 230,80" fill="none" stroke="#7B849D" stroke-width="1.6" marker-end="url(#ar1)"/><path d="M230,150 C195,175 185,175 150,150" fill="none" stroke="#7B849D" stroke-width="1.6" marker-end="url(#ar1)"/></svg><div class="cap">Le cycle : équilibre → déséquilibre → nouvel équilibre, en boucle.</div></div>
+<div class="fig"><svg viewBox="0 0 380 230" role="img" aria-label="Balance et imbalance"><rect x="20" y="70" width="150" height="90" fill="rgba(52,211,153,.10)" stroke="rgba(52,211,153,.4)"/><polyline points="22,150 45,80 68,150 91,80 114,150 137,82 160,150" fill="none" stroke="#E7EAF2" stroke-width="1.8"/><text x="95" y="185" text-anchor="middle" fill="#34D399" font-size="11" font-weight="700">Équilibre (range)</text><polyline points="170,120 200,150 230,60 255,95 290,30" fill="none" stroke="#FB7185" stroke-width="2.2"/><text x="300" y="55" fill="#FB7185" font-size="11" font-weight="700">Déséquilibre</text><text x="300" y="70" fill="#7B849D" font-size="10">→ nouvelle valeur</text></svg><div class="cap">Le prix passe 70–80 % du temps en équilibre, 20–30 % en déséquilibre.</div></div>
+</div>
+<div class="callout gold"><b>Important</b>L'AMT n'est pas une stratégie : c'est une <strong>philosophie</strong> qui raconte ce qui se passe vraiment. Pas besoin de Volume Profile, de TPO ou de chandeliers pour la comprendre — juste de ton imagination. Tous ces outils ne servent qu'à <em>visualiser</em> l'AMT.</div>
+<h3>Les 4 séquences à reconnaître</h3>
+<ol>
+<li><strong>Balance / Fair value</strong> : le prix oscille dans un range, beaucoup de volume, acheteurs ≈ vendeurs.</li>
+<li><strong>Imbalance</strong> : un côté prend le dessus, le prix s'échappe vite (peu de volume sur le trajet).</li>
+<li><strong>Balance → imbalance → nouvelle balance</strong> : le prix découvre une nouvelle zone de valeur et s'y stabilise.</li>
+<li><strong>Balance → imbalance → retour à la balance précédente</strong> : faux départ, le prix revient (piège classique).</li>
+</ol>
+`,
+quiz:[
+{q:"Selon l'AMT, qu'est-ce qui fait bouger le prix ?",options:["Des zones de support/résistance dessinées","Un déséquilibre réel entre offre et demande","Les phases de la lune"],answer:1,explain:"Le moteur est le déséquilibre offre/demande, pas des zones arbitraires."},
+{q:"Le prix passe la majorité du temps en…",options:["Déséquilibre (tendance)","Équilibre (range autour de la valeur) — 70 à 80 % du temps","Gap"],answer:1,explain:"70–80 % en équilibre. C'est pourquoi, aux bords de la valeur, le retour à la moyenne est plus probable que le breakout."},
+{q:"L'AMT est avant tout…",options:["Une stratégie d'entrée précise","Une philosophie pour comprendre le marché, que les outils ne font que visualiser","Un indicateur payant"],answer:1,explain:"AMT = cadre de compréhension ; le Volume Profile, le DOM, etc. ne sont que des manières de la voir."}
+]},
+
+{id:'m4',num:4,title:"Distribution en cloche & la valeur",subtitle:"Où le marché passe son temps : la cloche, les écarts-types, le POC.",
+html:`
+<p>Une distribution en cloche (bell curve) montre <strong>où se concentrent les valeurs</strong>. Appliquée au marché : la majorité des échanges se font autour d'un prix central (la valeur / fair price), et de moins en moins à mesure qu'on s'éloigne. C'est exactement ce que dessine le volume échangé sur une séance équilibrée.</p>
+<h4>La règle 70 / 95 / 99</h4>
+<ul>
+<li><strong>≈ 70 %</strong> du temps/volume entre <strong>+1σ et −1σ</strong> (la zone de valeur).</li>
+<li><strong>≈ 95 %</strong> entre +2σ et −2σ.</li>
+<li><strong>≈ 99 %</strong> entre +3σ et −3σ.</li>
+</ul>
+<p class="muted">σ = écart-type, μ = médiane (le centre).</p>
+<div class="fig"><svg viewBox="0 0 760 300" role="img" aria-label="Cloche avec écarts-types"><line x1="40" y1="250" x2="720" y2="250" stroke="#7B849D" stroke-width="1.5"/><line x1="380" y1="60" x2="380" y2="255" stroke="rgba(255,255,255,.18)" stroke-width="1" stroke-dasharray="4 4"/><path d="M60,250 C200,250 250,75 380,75 C510,75 560,250 700,250" fill="rgba(110,124,255,.12)" stroke="#6E7CFF" stroke-width="2.4"/><g fill="#7B849D" font-size="12" text-anchor="middle"><text x="380" y="268" fill="#E7EAF2">μ (POC)</text><text x="270" y="268">−1σ</text><text x="490" y="268">+1σ</text><text x="190" y="268">−2σ</text><text x="570" y="268">+2σ</text></g><g font-size="12" font-weight="700" text-anchor="middle"><line x1="270" y1="128" x2="490" y2="128" stroke="#34D399" stroke-width="1.5"/><text x="380" y="123" fill="#34D399">70 % — zone de valeur</text><line x1="190" y1="160" x2="570" y2="160" stroke="#38BDF8" stroke-width="1.5"/><text x="380" y="155" fill="#38BDF8">95 %</text></g></svg><div class="cap">La règle 68-95-99 appliquée au marché.</div></div>
+<h3>Cloche + AMT</h3>
+<p>Le sommet de la cloche = le <strong>Point of Control (POC)</strong>, le prix le plus actif. Les <strong>queues</strong> = zones de rejet, où un côté a poussé hors-équilibre avant de revenir (mean reversion). Quand le prix arrive <strong>près des bords</strong> (±1σ), deux scénarios :</p>
+<p><span class="pill"><span class="dot" style="background:var(--grn)"></span> Mean reversion — retour vers le POC (le plus probable)</span> <span class="pill"><span class="dot" style="background:var(--acc)"></span> Breakout — cassure vers une nouvelle valeur</span></p>
+<div class="callout grn"><b>La statistique qui change tout</b>Le prix passe 70–80 % du temps en équilibre. Donc aux bords de la cloche, la <strong>probabilité d'un retour à la moyenne est plus forte</strong> que celle d'un breakout. C'est la base : on ne chasse pas tous les mouvements, on joue les probabilités.</div>
+`,
+quiz:[
+{q:"Le sommet de la cloche de volume correspond au…",options:["VAH","POC (Point of Control), le prix le plus échangé","Stop loss"],answer:1,explain:"Le POC est le niveau de prix où le plus de volume s'est traité — le cœur de la valeur."},
+{q:"Quand le prix atteint le bord de la zone de valeur, le scénario le plus probable est…",options:["Le breakout","Le retour vers le POC (mean reversion)","Un gap"],answer:1,explain:"Puisque le marché est en équilibre 70-80 % du temps, le retour à la moyenne domine statistiquement."},
+{q:"La zone de valeur correspond à environ…",options:["70 % du volume (±1σ)","20 % du volume","100 % du volume"],answer:0,explain:"≈ 70 % du volume se traite dans la value area (entre VAL et VAH), soit ±1σ."}
+]},
+{id:'m5',num:5,title:'Volume Profile : POC, VAH, VAL, HVN, LVN',subtitle:"La cloche, mais dessinée par le vrai volume échangé à chaque prix.",
+html:`
+<p>Le Volume Profile montre <strong>combien de volume a été échangé à chaque niveau de prix</strong> sur une période. Au lieu d'afficher le volume dans le temps (barres classiques), il l'affiche <strong>par prix</strong> — un histogramme horizontal collé au graphique. C'est l'outil qui rend l'AMT visible.</p>
+<div class="grid2">
+<div class="fig"><svg viewBox="0 0 380 300" role="img" aria-label="Volume Profile VAH POC VAL"><rect x="150" y="95" width="180" height="120" fill="rgba(110,124,255,.07)"/><g fill="#3a4160"><rect x="230" y="40" width="40" height="9"/><rect x="220" y="52" width="50" height="9"/><rect x="205" y="64" width="65" height="9"/><rect x="190" y="76" width="80" height="9"/></g><g fill="#6E7CFF"><rect x="150" y="100" width="120" height="9"/><rect x="135" y="112" width="135" height="9"/><rect x="120" y="124" width="150" height="9"/></g><rect x="95" y="136" width="175" height="10" fill="#FB7185"/><g fill="#6E7CFF"><rect x="140" y="149" width="130" height="9"/><rect x="158" y="161" width="112" height="9"/><rect x="175" y="173" width="95" height="9"/></g><g fill="#3a4160"><rect x="200" y="186" width="70" height="9"/><rect x="215" y="198" width="55" height="9"/><rect x="232" y="210" width="38" height="9"/></g><line x1="40" y1="104" x2="150" y2="104" stroke="#38BDF8" stroke-width="1.4" stroke-dasharray="3 3"/><text x="38" y="102" text-anchor="end" fill="#38BDF8" font-size="13" font-weight="700">VAH</text><line x1="40" y1="141" x2="95" y2="141" stroke="#FB7185" stroke-width="1.6"/><text x="38" y="139" text-anchor="end" fill="#FB7185" font-size="13" font-weight="700">POC</text><line x1="40" y1="177" x2="175" y2="177" stroke="#38BDF8" stroke-width="1.4" stroke-dasharray="3 3"/><text x="38" y="175" text-anchor="end" fill="#38BDF8" font-size="13" font-weight="700">VAL</text></svg><div class="cap">VAH / POC / VAL : la structure de valeur lue par le volume.</div></div>
+<div class="fig"><svg viewBox="0 0 380 300" role="img" aria-label="HVN LVN"><g fill="#3a4160"><rect x="170" y="40" width="60" height="11"/><rect x="150" y="54" width="80" height="11"/></g><rect x="95" y="70" width="180" height="40" fill="none" stroke="#34D399" stroke-width="2"/><g fill="#6E7CFF"><rect x="120" y="72" width="150" height="11"/><rect x="100" y="86" width="170" height="11"/><rect x="130" y="100" width="140" height="11"/></g><text x="285" y="93" fill="#34D399" font-size="11" font-weight="700">HVN</text><rect x="208" y="120" width="70" height="34" fill="none" stroke="#FB7185" stroke-width="2"/><g fill="#3a4160"><rect x="232" y="124" width="38" height="10"/><rect x="240" y="138" width="30" height="10"/></g><text x="285" y="142" fill="#FB7185" font-size="11" font-weight="700">LVN</text><rect x="95" y="164" width="175" height="40" fill="none" stroke="#34D399" stroke-width="2"/><g fill="#6E7CFF"><rect x="125" y="166" width="145" height="11"/><rect x="105" y="180" width="165" height="11"/><rect x="135" y="194" width="135" height="11"/></g></svg><div class="cap">HVN = acceptation / fair value. LVN = rejet / cassure / S&amp;R.</div></div>
+</div>
+<h3>Le vocabulaire opérationnel</h3>
+<div class="card"><table>
+<tr><th>Niveau</th><th>Définition</th><th>Comment l'utiliser</th></tr>
+<tr><td><strong>POC</strong></td><td>Prix le plus échangé</td><td>Aimant à prix. Le marché y revient souvent. Cible de mean reversion.</td></tr>
+<tr><td><strong>VAH / VAL</strong></td><td>Haut / bas de la zone de valeur (70 %)</td><td>Bords de l'équilibre. Cassure franche = déséquilibre ; rejet = retour vers POC.</td></tr>
+<tr><td><strong>HVN</strong></td><td>High Volume Node — pic de volume</td><td>Zone d'acceptation, prix juste. Sert de support/résistance et de cible.</td></tr>
+<tr><td><strong>LVN</strong></td><td>Low Volume Node — creux de volume</td><td>Zone de rejet. Le prix la traverse vite : si elle est dégagée devant, mouvement rapide attendu.</td></tr>
+</table></div>
+<div class="callout"><b>Volume Profile + AMT en une phrase</b>Les HVN sont les zones où acheteurs et vendeurs sont d'accord (équilibre, prix justes) ; les LVN sont les zones où ils ne sont pas d'accord (déséquilibre, le prix fuit). Trader, c'est entrer quand le prix quitte un HVN à travers un LVN, et viser le prochain HVN.</div>
+`,
+quiz:[
+{q:"Un LVN (Low Volume Node) indique…",options:["Une zone d'acceptation où le prix stagne","Une zone de rejet que le prix traverse rapidement","Le POC"],answer:1,explain:"Peu de volume = pas d'accord sur le prix = le marché y passe vite. Dégagé devant le prix, il favorise un mouvement rapide."},
+{q:"La Value Area (entre VAL et VAH) contient environ…",options:["70 % du volume","30 % du volume","10 % du volume"],answer:0,explain:"Par convention, la value area regroupe ~70 % du volume de la période."},
+{q:"Un bon plan order flow type est…",options:["Acheter au hasard dans un HVN","Entrer quand le prix quitte un HVN à travers un LVN, viser le prochain HVN","Vendre uniquement la nuit"],answer:1,explain:"Le déséquilibre (sortie de HVN via LVN) porte le mouvement jusqu'à la prochaine zone d'acceptation."}
+]},
+
+{id:'m6',num:6,title:"Le carnet d'ordres (DOM) & l'order flow",subtitle:"Voir l'enchère en direct : bid/ask, profondeur, absorption, agression.",
+html:`
+<p>Le DOM (Depth of Market) affiche, en temps réel, <strong>les ordres limites en attente</strong> de part et d'autre du prix : les bids (acheteurs) en dessous, les asks (vendeurs) au-dessus. C'est la photographie de la liquidité — la défense de chaque camp.</p>
+<div class="fig"><svg viewBox="0 0 420 260" role="img" aria-label="DOM schéma"><text x="60" y="20" fill="#7B849D" font-size="11">Asks (vendeurs)</text><text x="300" y="20" fill="#7B849D" font-size="11">Bids (acheteurs)</text>
+<g font-size="12" fill="#E7EAF2"><text x="200" y="40" text-anchor="middle" fill="#FB7185">5012,00 — 380</text><text x="200" y="60" text-anchor="middle" fill="#FB7185">5011,75 — 520</text><text x="200" y="80" text-anchor="middle" fill="#FB7185">5011,50 — 910</text></g>
+<rect x="110" y="92" width="200" height="22" fill="rgba(110,124,255,.18)" stroke="var(--acc)"/><text x="200" y="108" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">5011,25 ← prix</text>
+<g font-size="12"><text x="200" y="132" text-anchor="middle" fill="#34D399">5011,00 — 1450</text><text x="200" y="152" text-anchor="middle" fill="#34D399">5010,75 — 870</text><text x="200" y="172" text-anchor="middle" fill="#34D399">5010,50 — 430</text></g>
+<text x="200" y="205" text-anchor="middle" fill="#7B849D" font-size="11">Gros bid à 5011,00 = mur d'acheteurs (support potentiel)</text>
+<text x="200" y="225" text-anchor="middle" fill="#7B849D" font-size="11">Le prix monte si les market buys mangent les asks plus vite qu'ils ne se rechargent</text></svg><div class="cap">Le DOM : la liquidité en attente. Le prix se déplace quand l'agression dévore une rangée.</div></div>
+<h3>Les comportements à lire</h3>
+<ul>
+<li><strong>Absorption.</strong> De gros market sells frappent un niveau mais le prix ne baisse pas : un acheteur passif absorbe tout. Signal de force acheteuse cachée → souvent suivi d'un rebond.</li>
+<li><strong>Pulling / stacking.</strong> La liquidité se retire (pulling) devant le prix = la voie est libre, mouvement probable ; ou s'empile (stacking) = défense qui se renforce.</li>
+<li><strong>Iceberg.</strong> Un ordre énorme caché qui se recharge en continu à un niveau : le prix bute dessus encore et encore = niveau clé défendu.</li>
+<li><strong>Spoofing (à ignorer).</strong> De faux gros ordres affichés pour tromper, retirés avant exécution. Ne jamais réagir à un seul gros chiffre : c'est la <em>transaction</em> (le tape) qui compte, pas l'affichage.</li>
+</ul>
+<div class="callout red"><b>Piège classique</b>Un débutant achète parce qu'il voit un « gros mur de bids ». Ce mur peut être du spoofing, ou être avalé en 2 secondes. On confirme toujours avec le tape (module 8) et le delta (module 7) : est-ce que les acheteurs <em>passent réellement à l'acte</em> ?</div>
+`,
+quiz:[
+{q:"L'absorption, c'est…",options:["Un gros flux agressif d'un côté que le prix ne suit pas, car un passif l'absorbe","Quand le marché est fermé","Un type d'indicateur"],answer:0,explain:"Beaucoup d'agression sans mouvement = un acteur passif absorbe ; souvent un retournement suit."},
+{q:"Le spoofing désigne…",options:["Une vraie zone de valeur","De faux gros ordres affichés puis retirés pour tromper","Un ordre au marché"],answer:1,explain:"C'est pourquoi on se fie aux transactions réelles (tape/delta), pas au seul affichage du DOM."},
+{q:"Le DOM affiche surtout…",options:["Les transactions passées","Les ordres limites en attente (la liquidité)","Le PIB"],answer:1,explain:"Le DOM = liquidité passive en attente. L'exécution réelle se lit sur le tape et le delta."}
+]},
+
+{id:'m7',num:7,title:"Footprint & Delta",subtitle:"Qui gagne le bras de fer, chiffré : volume acheteur vs vendeur à chaque prix.",
+html:`
+<p>Le <strong>delta</strong> = (volume exécuté à l'ask, donc acheteurs agressifs) − (volume exécuté au bid, vendeurs agressifs). Positif = les acheteurs dominent l'agression ; négatif = les vendeurs dominent. Le <strong>footprint chart</strong> affiche, dans chaque bougie, ce volume bid×ask prix par prix : c'est l'order flow rendu lisible.</p>
+<div class="fig"><svg viewBox="0 0 480 220" role="img" aria-label="Footprint et delta"><text x="20" y="18" fill="#7B849D" font-size="11">Bougie footprint (bid × ask par niveau)</text>
+<g font-family="monospace" font-size="12"><text x="40" y="50" fill="#FB7185">120</text><text x="80" y="50" fill="#34D399">x 410</text><text x="40" y="72" fill="#FB7185">260</text><text x="80" y="72" fill="#34D399">x 690</text><text x="40" y="94" fill="#FB7185">540</text><text x="80" y="94" fill="#34D399">x 980</text><text x="40" y="116" fill="#FB7185">310</text><text x="80" y="116" fill="#34D399">x 350</text></g>
+<text x="40" y="150" fill="#E7EAF2" font-size="12">Δ = +1340 (acheteurs agressifs dominent)</text>
+<line x1="270" y1="40" x2="270" y2="170" stroke="rgba(255,255,255,.12)"/>
+<text x="290" y="55" fill="#7B849D" font-size="11">Cumulative delta (CVD)</text>
+<polyline points="300,150 330,140 360,120 390,95 420,70 450,55" fill="none" stroke="#34D399" stroke-width="2"/>
+<text x="300" y="190" fill="#7B849D" font-size="10">CVD qui monte = pression acheteuse persistante</text></svg><div class="cap">Delta par bougie + cumulative delta (CVD) sur la séance.</div></div>
+<h3>Les signaux qui valent de l'or</h3>
+<ul>
+<li><strong>Divergence delta/prix.</strong> Le prix fait un nouveau plus-bas mais le delta non (les vendeurs s'essoufflent) → retournement haussier probable. Inverse en haut.</li>
+<li><strong>Absorption chiffrée.</strong> Delta très négatif mais le prix ne baisse pas → quelqu'un absorbe les ventes. Force cachée.</li>
+<li><strong>Exhaustion.</strong> Un énorme delta dans le sens du mouvement sur la dernière bougie, puis plus rien → le mouvement a brûlé ses munitions.</li>
+<li><strong>CVD de tendance.</strong> Un cumulative delta qui monte régulièrement confirme une vraie demande derrière la hausse (et non un short squeeze creux).</li>
+</ul>
+<div class="callout grn"><b>Pourquoi c'est puissant</b>Le prix peut mentir (mèche, faux breakout). Le delta dit <strong>si l'agression a réellement eu lieu</strong>. Une cassure de VAH avec delta fortement positif = vrai déséquilibre. Une cassure avec delta plat = piège.</div>
+`,
+quiz:[
+{q:"Un delta positif signifie…",options:["Les vendeurs agressifs dominent","Les acheteurs agressifs (au ask) dominent l'exécution","Le marché est fermé"],answer:1,explain:"Delta = volume à l'ask − volume au bid. Positif = agression acheteuse dominante."},
+{q:"Prix fait un nouveau plus-bas mais le delta ne suit pas (divergence). C'est…",options:["Un signe d'essoufflement des vendeurs → retournement haussier possible","La confirmation que ça va plonger","Sans intérêt"],answer:0,explain:"La divergence delta/prix révèle que l'agression ne soutient plus le mouvement."},
+{q:"Une cassure de VAH avec delta fortement positif suggère…",options:["Un faux breakout","Un vrai déséquilibre acheteur (à privilégier)","Rien du tout"],answer:1,explain:"Le delta confirme que l'agression acheteuse est réelle derrière la cassure."}
+]},
+{id:'m8',num:8,title:"Tape reading (time & sales)",subtitle:"Le flux des transactions, ordre par ordre — la lecture la plus fine de l'enchère.",
+html:`
+<p>Le tape (time &amp; sales) liste <strong>chaque transaction réellement exécutée</strong> : prix, taille, et côté (au bid = vente agressive, à l'ask = achat agressif). Là où le DOM montre les intentions (limites), le tape montre les <strong>actes</strong>. C'est l'order flow brut.</p>
+<h3>Ce qu'on cherche dans le tape</h3>
+<ul>
+<li><strong>Vitesse / accélération.</strong> Le tape « défile » d'un coup = burst d'agression = quelqu'un veut entrer maintenant. Tape qui ralentit = essoufflement.</li>
+<li><strong>Gros prints.</strong> Des transactions de grande taille répétées au même prix = un acteur sérieux. Du côté ask de façon répétée sans que le prix monte = absorption au-dessus (vendeur caché).</li>
+<li><strong>Sweep.</strong> Une rafale qui « nettoie » plusieurs niveaux d'un coup = ordre marché agressif qui traverse la liquidité = déséquilibre net.</li>
+</ul>
+<div class="card"><h4 style="margin-top:0">Ressource vidéo — lire une session ES uniquement au DOM</h4>
+<p class="muted">BoltzTrades — « Négociation du 5/20 $ES avec seulement la profondeur de marché ». Une session ES tradée sans aucun indicateur, juste DOM + tape : l'AMT en direct, ordre par ordre.</p>
+<div style="position:relative;padding-top:56.25%;border-radius:14px;overflow:hidden;border:1px solid var(--line2);margin-top:10px"><iframe src="https://www.youtube.com/embed/hfvhlaoKdwU" title="BoltzTrades DOM ES" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe></div></div>
+<div class="callout"><b>Hiérarchie de confirmation</b>Volume Profile (où) → Delta/footprint (qui gagne) → DOM (la défense) → Tape (l'acte final, le timing d'entrée). Le tape est le déclencheur de précision, jamais le point de départ.</div>
+<div class="callout gold"><b>Réaliste</b>Le tape reading pur demande des centaines d'heures de screen time. Pour une stratégie mécanique rentable (module 9-10), tu n'as PAS besoin de le maîtriser parfaitement : le delta sur barre suffit à confirmer une cassure. Le tape est un bonus de finesse, pas un prérequis.</div>
+`,
+quiz:[
+{q:"Différence DOM vs tape ?",options:["Le DOM montre les ordres en attente (intentions), le tape montre les transactions réelles (actes)","Ils sont identiques","Le tape montre le PIB"],answer:0,explain:"DOM = liquidité passive ; tape = exécutions réelles. Le tape confirme ce que le DOM ne fait que suggérer."},
+{q:"Un sweep, c'est…",options:["Une rafale d'ordres marché qui nettoie plusieurs niveaux d'un coup","Un balai","Une bougie verte"],answer:0,explain:"Le sweep traverse la liquidité = déséquilibre agressif net."},
+{q:"Pour une stratégie mécanique, le tape reading parfait est…",options:["Obligatoire dès le jour 1","Un bonus : le delta sur barre suffit à confirmer une cassure","Inutile pour toujours"],answer:1,explain:"Le delta confirme l'agression sans exiger des centaines d'heures de tape ; le tape affine plus tard."}
+]},
+
+{id:'m9',num:9,title:"Confluence : assembler les pièces",subtitle:"Une seule donnée ne suffit jamais. La confluence transforme le bruit en signal.",
+html:`
+<p>Chaque outil pris isolément génère de faux signaux. La <strong>confluence</strong>, c'est exiger que plusieurs lectures indépendantes pointent dans la même direction <em>avant</em> d'agir. C'est ce qui sépare un trade à edge d'un pari.</p>
+<h3>La grille de confluence (à cocher avant chaque trade)</h3>
+<div class="card"><table>
+<tr><th>Couche</th><th>Question</th><th>Validé si…</th></tr>
+<tr><td><strong>Contexte AMT</strong></td><td>Jour en équilibre ou déséquilibre ?</td><td>Déséquilibre clair (le prix quitte la valeur), pas un range mou.</td></tr>
+<tr><td><strong>Volume Profile</strong></td><td>Où est le prix vs POC/VAH/VAL ?</td><td>Cassure d'un bord de value area, LVN dégagé devant, prochain HVN comme cible.</td></tr>
+<tr><td><strong>Delta / footprint</strong></td><td>L'agression suit-elle ?</td><td>Delta dans le sens de la cassure ; pas de divergence contre toi.</td></tr>
+<tr><td><strong>DOM / tape</strong></td><td>La défense cède-t-elle ?</td><td>Liquidité opposée qui se retire / se fait sweeper, pas d'absorption contre toi.</td></tr>
+<tr><td><strong>Risque</strong></td><td>Le stop logique tient-il dans mon R ?</td><td>Stop ≤ taille max définie (module 10). Sinon : pas de trade.</td></tr>
+</table></div>
+<div class="callout grn"><b>Règle d'or</b>3 couches alignées minimum, dont toujours le contexte AMT et le risque. Si une couche te contredit fort (ex : delta divergent), tu passes ton tour. <strong>Ne pas trader est une position.</strong></div>
+<h3>Le piège inverse : la sur-confluence</h3>
+<p>Attendre que <em>tout</em> soit parfait = ne jamais entrer, ou entrer trop tard. La confluence n'est pas la perfection : c'est un seuil (ex. 3/5) défini à l'avance et appliqué mécaniquement. Le module suivant fige ce seuil dans une stratégie concrète.</p>
+`,
+quiz:[
+{q:"La confluence consiste à…",options:["Utiliser un seul indicateur très fiable","Exiger que plusieurs lectures indépendantes s'alignent avant d'agir","Trader dès qu'un signal apparaît"],answer:1,explain:"Plusieurs confirmations indépendantes réduisent les faux signaux."},
+{q:"Si le delta diverge fortement contre ton idée de trade, tu…",options:["Entres quand même","Passes ton tour — une couche clé te contredit","Doubles la taille"],answer:1,explain:"Une contradiction forte casse la confluence ; ne pas trader est une décision valide."},
+{q:"La sur-confluence (attendre la perfection) mène à…",options:["Des entrées trop tardives ou inexistantes","Des gains garantis","Un meilleur sommeil uniquement"],answer:0,explain:"Il faut un seuil défini à l'avance (ex. 3/5), appliqué mécaniquement — pas la perfection."}
+]},
+
+{id:'m10',num:10,title:"La stratégie : ORB ES session New York",subtitle:"Le capstone. Une stratégie mécanique, chiffrée, à espérance positive — règles complètes.",
+html:`
+<p>Voici la stratégie qui réunit tout le parcours. Elle est <strong>mécanique</strong> (peu de jugement), à <strong>gros R/R</strong> (le gain moyen écrase la perte moyenne), et son edge a tenu en <strong>walk-forward</strong> (règles figées, jamais ré-optimisées sur le futur) sur 129 jours de ticks ES réels.</p>
+<div class="grid3">
+<div class="stat"><div class="v" style="color:var(--grn)">PF 1,48</div><div class="l">profit factor (out-of-sample)</div></div>
+<div class="stat"><div class="v" style="color:var(--grn)">+67 $</div><div class="l">par trade (out-of-sample)</div></div>
+<div class="stat"><div class="v">31,8 %</div><div class="l">win rate (bas par conception)</div></div>
+</div>
+<h3>Les règles, sans ambiguïté</h3>
+<div class="card">
+<ol>
+<li><strong>Marché &amp; horaire.</strong> ES (ou MES pour s'entraîner). On ne regarde que la <strong>session New York</strong>.</li>
+<li><strong>Range d'ouverture (ORB).</strong> On marque le plus-haut et le plus-bas des <strong>15 premières minutes</strong> de la séance cash US (09:30–09:45 heure de New York).</li>
+<li><strong>Entrée.</strong> Sur <strong>cassure confirmée</strong> d'un côté du range (clôture de barre au-delà), <strong>dans le sens où le delta confirme</strong> l'agression. Filtre AMT : la cassure doit s'éloigner de la valeur (POC) et franchir un bord (VAH/VAL) avec un LVN dégagé devant.</li>
+<li><strong>Stop.</strong> Au côté opposé du range, plafonné à <strong>10 points</strong> max. Si le range est plus large, on réduit la taille ou on saute le trade.</li>
+<li><strong>Sortie.</strong> À <strong>15:55</strong> (heure NY), en fin de séance. Pas de gestion discrétionnaire au milieu : on laisse l'edge s'exprimer.</li>
+<li><strong>Fréquence.</strong> <strong>1 trade par jour maximum.</strong> Pas de revenge trade, pas de re-entrée.</li>
+</ol>
+</div>
+<div class="callout"><b>Pourquoi ça marche (AMT)</b>Les 15 premières minutes établissent la valeur initiale du jour. Une cassure confirmée par le delta = le marché a décidé d'un déséquilibre directionnel pour la séance. On surfe le déplacement de valeur, stop serré au cas où c'est un faux départ, et on encaisse le mouvement de tendance des jours en déséquilibre.</div>
+<h3>La vérité sur les pertes (lis ça deux fois)</h3>
+<p>Win rate 31,8 % = <strong>tu perds environ 2 trades sur 3</strong>. C'est normal et voulu : le gain moyen (gros R) paie largement les nombreuses petites pertes. Sur 7 mois testés, <strong>3 mois étaient rouges</strong> (décembre, janvier, mai) ; ce sont février et juin qui ont porté la performance.</p>
+<div class="callout red"><b>Le vrai risque n'est pas le marché, c'est toi</b>Si tu abandonnes la stratégie après une série de pertes (et il y en aura), tu rateras les mois qui paient. <strong>La discipline n'est pas un bonus ici : c'est l'edge lui-même.</strong> Sans la tenir mécaniquement sur 100+ trades, l'espérance positive ne se matérialise jamais.</div>
+<h3>Sizing &amp; compte</h3>
+<p>Le drawdown réel observé (~2 738 $) <strong>dépasse</strong> le trailing d'un Topstep 50K (qui impose ~100 $/trade) mais passe <strong>confortablement sur un FTMO 100K à 200 $/trade</strong>. Conclusion : adapte la taille au compte (module 11), jamais l'inverse.</p>
+<div class="callout grn"><b>Plan d'action concret</b>1) Lance-la en démo/sim sur ES. 2) Note chaque trade dans le journal (module 11). 3) Compare ton exécution aux règles ci-dessus. 4) Vise &gt; 90 % de « plan respecté » sur 30+ trades avant tout euro réel. 5) Puis prop firm (module 13).</div>
+`,
+quiz:[
+{q:"À quelle heure (NY) marque-t-on le range d'ouverture ?",options:["Sur les 15 premières minutes (09:30–09:45)","À minuit","Sur toute la journée"],answer:0,explain:"L'ORB se base sur le plus-haut/plus-bas des 15 premières minutes de la séance cash US."},
+{q:"Le win rate de 31,8 % signifie que la stratégie…",options:["Est mauvaise","Est rentable grâce à un gros R/R : le gain moyen écrase la perte moyenne","Gagne 2 fois sur 3"],answer:1,explain:"À gros R/R, un faible win rate reste très rentable ; ce qui compte est l'espérance."},
+{q:"Quelle est la vraie source d'échec de cette stratégie ?",options:["Le marché","Abandonner après une série de pertes et rater les mois gagnants (l'indiscipline)","Le choix du broker"],answer:1,explain:"Les mois rouges existent ; sans discipline mécanique sur la durée, l'edge ne se matérialise pas."},
+{q:"Le stop est placé…",options:["Au côté opposé du range, plafonné à 10 points","À 50 points fixes","Pas de stop"],answer:0,explain:"Stop au côté opposé du range, max 10 pts ; sinon on réduit la taille ou on saute le trade."}
+]},
+{id:'m11',num:11,title:"Gestion du risque & sizing",subtitle:"La seule compétence non négociable. Le risque AVANT le profit, toujours.",
+html:`
+<p>Tu peux avoir la meilleure lecture du monde : un seul mauvais sizing te ruine. Le risque n'est pas un détail défensif, c'est <strong>ce qui te garde dans le jeu</strong> assez longtemps pour que ton edge s'exprime.</p>
+<h3>Le R : ton unité de mesure</h3>
+<p>1R = le montant que tu risques sur un trade (ta perte si le stop saute). Tout se mesure en R : un trade qui gagne 2,4× ton risque = +2,4R ; ta perte plafond = −1R. En raisonnant en R, le résultat en euros devient secondaire et tu arrêtes de trader « pour l'argent ».</p>
+<div class="card"><h4 style="margin-top:0">Les 3 règles de fer</h4>
+<ul>
+<li><strong>Risque fixe par trade :</strong> 0,25 à 1 % du capital, jamais plus. (Sur prop firm, calibré pour ne jamais menacer le trailing.)</li>
+<li><strong>Le risque définit la taille</strong> — pas l'envie de gagner. On calcule le nombre de contrats à partir du stop (voir calculateur).</li>
+<li><strong>Stop toujours posé avant l'entrée.</strong> Pas de stop = pas de trade. Jamais d'élargissement de stop en cours de route.</li>
+</ul></div>
+<h3>L'espérance : la seule chose qui compte</h3>
+<p>Espérance = (WR × gain moyen) − ((1−WR) × perte moyenne). Avec la stratégie ES : (0,318 × 2,4R) − (0,682 × 1R) ≈ <strong>+0,08R par trade</strong>. Faible par trade, mais répété 200×/an = +16R = un rendement solide. C'est tout l'enjeu : un petit edge × discipline × répétition.</p>
+<div class="callout grn"><b>Outil</b>Utilise le calculateur d'espérance &amp; la simulation de 200 trades (menu Outils). Fais tourner la simulation plusieurs fois : tu verras des séries de 6-8 pertes d'affilée même avec un edge positif. <strong>Les vivre à l'avance</strong>, c'est ne pas paniquer quand elles arrivent en réel.</div>
+<h3>Trailing drawdown (prop firm)</h3>
+<p>La plupart des comptes financés ont un seuil qui <strong>suit ton plus haut d'equity</strong>. Si tu montes à +2 000 € puis redescends, le seuil est monté aussi. Beaucoup font sauter leur compte non pas en perdant, mais en rendant des gains. Le calculateur dédié te montre exactement où est ton plancher.</p>
+`,
+quiz:[
+{q:"Qu'est-ce que 1R ?",options:["Le montant risqué sur un trade (perte si le stop saute)","Le profit garanti","Le capital total"],answer:0,explain:"Tout se mesure en R : +2,4R = 2,4× le risque ; −1R = perte plafond."},
+{q:"Qu'est-ce qui détermine la taille de position ?",options:["L'envie de gagner gros","Le risque (capital × risque% ÷ distance au stop)","Le nombre de followers"],answer:1,explain:"Le risque définit la taille. C'est le rôle du calculateur de position."},
+{q:"Sur une stratégie à edge positif, une série de 6-8 pertes d'affilée est…",options:["Impossible","Normale et à anticiper — d'où l'intérêt de simuler à l'avance","La preuve que l'edge est faux"],answer:1,explain:"Les séries de pertes sont statistiquement normales ; les simuler évite la panique en réel."}
+]},
+
+{id:'m12',num:12,title:"Psychologie & discipline d'exécution",subtitle:"Là où 90 % des stratégies rentables meurent : entre la chaise et l'écran.",
+html:`
+<p>Une stratégie rentable exécutée avec indiscipline devient perdante. La psychologie n'est pas du développement personnel : c'est la <strong>fidélité mécanique à un plan</strong> malgré l'inconfort émotionnel.</p>
+<h3>Les ennemis internes</h3>
+<ul>
+<li><strong>Tilt / revenge trading.</strong> Après une perte, vouloir « se refaire » → trade hors plan → spirale. Antidote : 1 trade/jour max, règle absolue.</li>
+<li><strong>FOMO.</strong> Entrer parce que « ça part sans moi ». Antidote : ton setup ou rien. Le marché redonne des occasions chaque jour.</li>
+<li><strong>Coupe les gains, laisse courir les pertes.</strong> L'inverse de ce qu'il faut, dicté par la peur. Antidote : stop et sortie mécaniques, décidés avant l'entrée.</li>
+<li><strong>Sur-trading.</strong> Confondre activité et progrès. Antidote : mesurer le « plan respecté », pas le nombre de trades.</li>
+</ul>
+<div class="callout grn"><b>La métrique reine</b>Dans ton journal, vise <strong>&gt; 90 % de trades « plan respecté »</strong>. Cette métrique prédit ta rentabilité future bien mieux que le résultat d'un trade isolé. Un perdant exécuté parfaitement = une victoire de discipline.</div>
+<h3>Le protocole quotidien</h3>
+<ol>
+<li><strong>Avant :</strong> plan écrit (niveaux VP, scénario, taille calculée). Si tu n'as pas de plan, tu ne tradEs pas.</li>
+<li><strong>Pendant :</strong> exécution seulement. Pas de nouvelle décision discrétionnaire hors des règles.</li>
+<li><strong>Après :</strong> journal immédiat (R, plan respecté ou non, note). Aucune justification émotionnelle.</li>
+<li><strong>Hebdo :</strong> revue des stats (espérance, plan respecté). On améliore le process, pas le résultat d'un trade.</li>
+</ol>
+<div class="callout"><b>Mindset</b>Tu n'es pas payé pour avoir raison, mais pour suivre un processus à espérance positive. Détache ton ego du résultat de chaque trade. Le marché est un casino où, pour une fois, c'est toi qui tiens la maison — à condition de jouer toujours le même jeu.</div>
+`,
+quiz:[
+{q:"La métrique qui prédit le mieux ta rentabilité future est…",options:["Le résultat de ton dernier trade","Le % de trades 'plan respecté' sur la durée","Ton nombre de trades par jour"],answer:1,explain:"La discipline d'exécution (plan respecté) prédit la rentabilité bien mieux qu'un résultat isolé."},
+{q:"L'antidote au revenge trading est…",options:["Doubler la mise pour se refaire","Une règle absolue de 1 trade/jour max","Changer de stratégie chaque jour"],answer:1,explain:"Limiter la fréquence coupe net la spirale émotionnelle après une perte."},
+{q:"Un trade perdant mais parfaitement exécuté est…",options:["Un échec","Une victoire de discipline (bonne décision sur un edge à faible WR)","La preuve que la stratégie est nulle"],answer:1,explain:"Sur un edge à gros R/R, les pertes bien exécutées font partie du plan gagnant."}
+]},
+
+{id:'m13',num:13,title:"Prop firms : payoff asymétrique & plan FTMO",subtitle:"Trader gros sans risquer gros : l'arithmétique des comptes financés.",
+html:`
+<p>Une prop firm te finance un compte (50K, 100K…) après une évaluation payante. L'intérêt tient à une <strong>asymétrie</strong> : ta perte max est plafonnée au <strong>prix de l'éval</strong> (le frais d'inscription) ; ton gain potentiel sur le capital financé est <strong>bien supérieur et non plafonné</strong> (via le profit split). Tu risques peu pour accéder à beaucoup.</p>
+<div class="grid2">
+<div class="card"><h4 style="margin-top:0;color:var(--grn)">Le côté pile</h4><ul><li>Downside fixe : le coût de l'éval (et ton temps).</li><li>Upside large : les payouts du compte financé, répétables.</li><li>Avec un edge même modeste et un taux de passage raisonnable, l'espérance peut être positive.</li></ul></div>
+<div class="card"><h4 style="margin-top:0;color:var(--red)">Le côté face</h4><ul><li>Le trailing drawdown peut faire sauter le compte avant que l'edge s'exprime.</li><li>Règles (daily loss, consistency) qui transforment une bonne stratégie en échec si la discipline manque.</li><li>L'asymétrie n'est favorable que si tu <strong>survis</strong> assez longtemps pour encaisser l'upside.</li></ul></div>
+</div>
+<h3>Plan concret FTMO 100K avec la stratégie ES</h3>
+<ol>
+<li><strong>Calibre la taille :</strong> 200 $/trade passe le trailing FTMO 100K (vu au module 10). Utilise le calculateur de position.</li>
+<li><strong>Respecte le daily loss :</strong> 1 trade/jour + stop ≤ 10 pts = exposition quotidienne maîtrisée par construction.</li>
+<li><strong>Passe l'éval avec la même stratégie</strong> qu'en réel. Ne change rien entre démo, éval et financé : c'est le même jeu.</li>
+<li><strong>Protège le trailing :</strong> dès que tu es en profit, le seuil monte — ne rends pas tes gains par sur-trading. 1 trade/jour t'y aide.</li>
+</ol>
+<div class="callout gold"><b>Lien avec la stratégie</b>Le drawdown réel (~2 738 $) tient sur un FTMO 100K à 200 $/trade mais ferait sauter un Topstep 50K à 100 $/trade. Choisis le compte en fonction du drawdown de ta stratégie, pas du capital affiché.</div>
+<div class="callout red"><b>Garde-fou</b>La prop firm n'est pas un raccourci pour sauter l'apprentissage. Sans les 90 jours de démo (module 14) et un journal &gt; 90 % plan respecté, tu ne fais qu'acheter des évals que tu feras sauter. L'asymétrie ne joue qu'avec un edge réel et de la discipline.</div>
+`,
+quiz:[
+{q:"L'asymétrie d'une prop firm, c'est…",options:["Perte plafonnée au prix de l'éval, gain potentiel bien supérieur via le profit split","Gain plafonné, perte illimitée","Aucun risque, gains garantis"],answer:0,explain:"Downside fixe (l'éval), upside large (les payouts) — d'où l'intérêt mathématique, SI tu as un edge."},
+{q:"On choisit son compte prop firm en fonction de…",options:["Du capital affiché le plus gros","Du drawdown de sa stratégie vs le trailing du compte","De la couleur du logo"],answer:1,explain:"Le drawdown réel de ta stratégie doit tenir dans le trailing : sinon le compte saute."},
+{q:"La prop firm est…",options:["Un raccourci pour éviter l'apprentissage","Un amplificateur de capital qui n'aide que si tu as déjà un edge et de la discipline","Un jeu de hasard rentable"],answer:1,explain:"Sans edge ni discipline (90 jours de démo, journal), on ne fait qu'acheter des évals qu'on fait sauter."}
+]},
+
+{id:'m14',num:14,title:"Plan 90 jours : de la démo au live",subtitle:"La feuille de route mesurable pour transformer le savoir en compétence.",
+html:`
+<p>Savoir n'est pas savoir-faire. Ce plan de 90 jours convertit la théorie en exécution fiable, avec des <strong>critères de passage chiffrés</strong> à chaque étape. On ne passe à l'étape suivante que si les métriques sont vertes.</p>
+<h3>Phase 1 — Jours 1 à 30 : lecture &amp; démo</h3>
+<ul>
+<li>Finir les 14 modules + réussir l'examen final.</li>
+<li>Trainer de lecture : atteindre <strong>&gt; 60 %</strong> de bonnes lectures.</li>
+<li>Trader la stratégie ES en <strong>démo</strong>, 1 trade/jour, journal systématique.</li>
+<li><strong>Passage :</strong> 20+ trades journalisés, &gt; 80 % de plan respecté.</li>
+</ul>
+<h3>Phase 2 — Jours 31 à 60 : consolidation &amp; éval</h3>
+<ul>
+<li>Continuer en démo/sim, viser la <strong>régularité d'exécution</strong> (pas le profit).</li>
+<li>Espérance positive sur l'échantillon, &gt; 90 % de plan respecté.</li>
+<li>Démarrer une <strong>évaluation prop firm</strong> (FTMO 100K) avec exactement les mêmes règles.</li>
+<li><strong>Passage :</strong> éval réussie OU 40+ trades démo à espérance positive et discipline tenue.</li>
+</ul>
+<h3>Phase 3 — Jours 61 à 90 : financé / petit live</h3>
+<ul>
+<li>Trader le compte financé (ou très petit live MES) avec le sizing calibré sur le trailing.</li>
+<li>Protéger le capital : respecter daily loss et trailing, ne pas rendre les gains.</li>
+<li>Revue hebdo des stats ; améliorer le <em>process</em>, jamais forcer le résultat.</li>
+<li><strong>Objectif :</strong> survivre 30 jours sur compte financé en respectant 100 % des règles. La rentabilité suit la discipline.</li>
+</ul>
+<div class="callout grn"><b>Boucle de progrès</b>Modules → Trainer → Démo journalisée → Examen → Éval → Financé. À chaque étape, ce sont les <strong>métriques</strong> (plan respecté, espérance, trainer %) qui décident, pas l'impatience. C'est lent, et c'est exactement pour ça que ça marche là où 97 % échouent.</div>
+<div class="callout red"><b>Dernier rappel</b>Aucune formation ne garantit de gagner. Le trading reste risqué et la majorité perd. Ce plan maximise tes chances en imposant discipline et patience — il ne supprime pas le risque. Démo d'abord, risque maîtrisé toujours.</div>
+`,
+quiz:[
+{q:"On passe d'une phase à la suivante…",options:["Quand on s'ennuie","Seulement si les métriques (plan respecté, espérance, trainer %) sont au vert","Au bout d'une semaine quoi qu'il arrive"],answer:1,explain:"Le plan est piloté par des critères chiffrés, pas par l'impatience."},
+{q:"En phase 1 (jours 1-30), l'objectif principal est…",options:["Gagner beaucoup d'argent","Lecture > 60 %, démo journalisée, > 80 % plan respecté","Passer en gros live tout de suite"],answer:1,explain:"On construit la compétence et la discipline en démo avant tout capital réel."},
+{q:"Sur compte financé (phase 3), l'objectif est…",options:["Maximiser le profit en sur-tradant","Survivre 30 jours en respectant 100 % des règles ; la rentabilité suit la discipline","Rendre ses gains pour tester le trailing"],answer:1,explain:"La survie disciplinée précède la rentabilité ; le trailing punit le sur-trading."}
+]}
+];
+const EXAM_POOL = [
+{q:"Sur ES, 1 point vaut :",options:["12,50 $","50 $","250 $"],answer:1},
+{q:"Le moteur du mouvement de prix, selon l'AMT, est :",options:["Des zones dessinées","Le déséquilibre réel offre/demande","Le calendrier économique seul"],answer:1},
+{q:"Le prix passe la majorité du temps en :",options:["Déséquilibre","Équilibre (70-80 %)","Gap"],answer:1},
+{q:"Le POC est :",options:["Le plus-haut du jour","Le prix le plus échangé (sommet de la cloche)","Le stop"],answer:1},
+{q:"La Value Area regroupe environ :",options:["70 % du volume","20 % du volume","100 % du volume"],answer:0},
+{q:"Un LVN signale :",options:["Acceptation/stagnation","Rejet : le prix le traverse vite","Le POC"],answer:1},
+{q:"Aux bords de la zone de valeur, le scénario le plus probable est :",options:["Breakout","Retour à la moyenne (vers le POC)","Gap"],answer:1},
+{q:"Le DOM affiche :",options:["Les transactions passées","Les ordres limites en attente (liquidité)","Le PIB"],answer:1},
+{q:"L'absorption, c'est :",options:["De l'agression d'un côté que le prix ne suit pas (un passif absorbe)","Un marché fermé","Une bougie verte"],answer:0},
+{q:"Le spoofing désigne :",options:["Une vraie zone de valeur","De faux gros ordres affichés puis retirés","Un ordre marché"],answer:1},
+{q:"Le delta est :",options:["Volume à l'ask − volume au bid (agression nette)","Le spread","La volatilité"],answer:0},
+{q:"Une divergence delta/prix en bas suggère :",options:["Continuation baissière","Essoufflement vendeur → retournement haussier possible","Rien"],answer:1},
+{q:"Le tape (time & sales) montre :",options:["Les ordres en attente","Les transactions réellement exécutées","Les news"],answer:1},
+{q:"La hiérarchie de confirmation est :",options:["Tape → puis on cherche un contexte","Volume Profile (où) → delta (qui gagne) → DOM/tape (timing)","DOM uniquement"],answer:1},
+{q:"La confluence consiste à :",options:["Suivre un seul signal","Exiger plusieurs lectures alignées avant d'agir","Trader sans plan"],answer:1},
+{q:"L'ORB de la stratégie se marque sur :",options:["Les 15 premières minutes de la séance US","Toute la nuit","La clôture"],answer:0},
+{q:"Le win rate ~32 % de la stratégie ES est rentable parce que :",options:["Le gros R/R fait que le gain moyen écrase la perte moyenne","Elle gagne en fait 68 %","Le broker rembourse"],answer:0},
+{q:"La vraie cause d'échec de la stratégie ES est :",options:["Le marché","Abandonner après une série de pertes (indiscipline)","Le mauvais broker"],answer:1},
+{q:"1R représente :",options:["Le montant risqué par trade","Le capital total","Le profit garanti"],answer:0},
+{q:"Ce qui détermine la taille de position :",options:["L'envie de gagner","Le risque : capital × risque% ÷ distance au stop","Le nombre de contrats favoris"],answer:1},
+{q:"L'espérance se calcule :",options:["WR × gain moyen − (1−WR) × perte moyenne","Gains − frais","Win rate seul"],answer:0},
+{q:"Le trailing drawdown :",options:["Est fixe","Suit ton plus haut d'equity (on peut sauter en rendant des gains)","N'existe pas"],answer:1},
+{q:"La métrique qui prédit le mieux la rentabilité future :",options:["Le dernier trade","Le % de 'plan respecté' sur la durée","Le nombre de trades/jour"],answer:1},
+{q:"L'asymétrie d'une prop firm :",options:["Perte plafonnée (l'éval), upside large (payouts)","Perte illimitée","Gains garantis"],answer:0},
+{q:"Avant tout euro réel, le plan 90 jours impose :",options:["Rien","Démo journalisée, > 90 % plan respecté, examen réussi","De trader gros tout de suite"],answer:1},
+{q:"Un trade perdant parfaitement exécuté est :",options:["Un échec","Une bonne décision (victoire de discipline)","La preuve d'une mauvaise stratégie"],answer:1}
+];
+const GLOSSARY = [
+{t:"AMT",d:"Auction Market Theory. Le marché vu comme une enchère continue cherchant le prix juste via l'équilibre/déséquilibre."},
+{t:"Order flow",d:"L'étude des ordres réels (agression, liquidité, volume) plutôt que des indicateurs dérivés du prix."},
+{t:"Bid / Ask",d:"Meilleur prix acheteur (bid) et vendeur (ask). Leur écart = le spread."},
+{t:"Market order",d:"Ordre exécuté immédiatement en traversant le spread (agressif, prend la liquidité)."},
+{t:"Limit order",d:"Ordre posté dans le carnet en attente (passif, fournit la liquidité)."},
+{t:"Tick",d:"Plus petit incrément de prix. ES : 1 tick = 0,25 pt = 12,50 $/contrat."},
+{t:"Point",d:"4 ticks sur ES = 50 $/contrat."},
+{t:"DOM",d:"Depth of Market : le carnet d'ordres, liquidité limite en attente de chaque côté."},
+{t:"Tape (T&S)",d:"Time & Sales : le flux des transactions réellement exécutées (prix, taille, côté)."},
+{t:"Delta",d:"Volume agressif acheteur (ask) − volume agressif vendeur (bid). Mesure qui domine l'exécution."},
+{t:"CVD",d:"Cumulative Volume Delta : le delta cumulé sur la séance, révèle la pression de fond."},
+{t:"Footprint",d:"Graphique montrant le volume bid×ask à chaque niveau de prix dans la bougie."},
+{t:"Volume Profile",d:"Histogramme du volume échangé par niveau de prix sur une période."},
+{t:"POC",d:"Point of Control : le prix le plus échangé (sommet du profil de volume)."},
+{t:"Value Area (VA)",d:"Fourchette contenant ~70 % du volume, entre VAL (bas) et VAH (haut)."},
+{t:"VAH / VAL",d:"Value Area High / Low : bornes haute et basse de la zone de valeur."},
+{t:"HVN",d:"High Volume Node : pic de volume = zone d'acceptation / fair value / support-résistance."},
+{t:"LVN",d:"Low Volume Node : creux de volume = zone de rejet, traversée rapidement."},
+{t:"Absorption",d:"Agression d'un côté que le prix ne suit pas car un acteur passif l'absorbe ; signal de force cachée."},
+{t:"Exhaustion",d:"Épuisement : énorme agression finale puis plus rien — le mouvement a brûlé ses munitions."},
+{t:"Divergence",d:"Le prix et le delta vont dans des sens opposés ; signal d'essoufflement/retournement."},
+{t:"Spoofing",d:"Faux gros ordres affichés puis retirés pour tromper ; on s'y fie jamais."},
+{t:"ORB",d:"Opening Range Breakout : cassure du range des 1ères minutes de séance (notre stratégie : 15 min NY)."},
+{t:"R",d:"Unité de risque : 1R = montant risqué par trade. Résultats mesurés en multiples de R."},
+{t:"Espérance",d:"(WR × gain moyen) − ((1−WR) × perte moyenne). Le profit moyen attendu par trade."},
+{t:"Profit Factor",d:"Somme des gains ÷ somme des pertes. > 1 = rentable. Stratégie ES : ~1,48 out-of-sample."},
+{t:"Walk-forward",d:"Test où les règles sont figées sur le passé puis évaluées sur des données jamais vues (anti-overfitting)."},
+{t:"Trailing drawdown",d:"Seuil de perte d'un compte prop qui suit le plus haut d'equity atteint."},
+{t:"Prop firm",d:"Société qui finance un compte après une évaluation payante, en échange d'un partage des profits."}
+];
+const SCENARIOS = [
+{ctx:"ES, session NY. Le prix casse le <b>VAH</b> avec un <b>delta fortement positif</b>, un LVN est dégagé au-dessus, et les asks se retirent (pulling). CVD en hausse régulière.",
+ bars:[{dir:1,body:14,h:8},{dir:-1,body:10,h:10},{dir:1,body:16,h:6},{dir:1,body:20,h:8},{dir:1,body:26,h:10},{dir:1,body:34,h:8},{dir:1,body:42,h:6},{dir:1,body:50,h:8}],
+ answer:0,explain:"Cassure de value area + delta confirmant l'agression acheteuse + LVN dégagé + liquidité qui se retire = vrai déséquilibre haussier. C'est le setup ORB long type."},
+{ctx:"Le prix atteint le <b>bord supérieur de la zone de valeur</b> (proche +1σ) après une longue séance de range. Le delta s'aplatit, des gros asks s'empilent (stacking), aucun sweep.",
+ bars:[{dir:1,body:20,h:8},{dir:-1,body:18,h:8},{dir:1,body:22,h:8},{dir:-1,body:19,h:8},{dir:1,body:24,h:10},{dir:-1,body:23,h:8},{dir:1,body:25,h:14},{dir:-1,body:22,h:10}],
+ answer:2,explain:"Bord de value area + delta plat (pas d'agression) + vendeurs qui s'empilent = mean reversion probable vers le POC. On ne chasse pas la cassure ; le retour à la moyenne domine (70-80 % du temps en équilibre)."},
+{ctx:"Marché en plein <b>range</b> autour du POC, milieu de séance calme. Delta oscille autour de zéro, volume moyen, pas de cassure de VAH/VAL.",
+ bars:[{dir:1,body:18,h:8},{dir:-1,body:17,h:8},{dir:1,body:19,h:8},{dir:-1,body:18,h:8},{dir:1,body:18,h:8},{dir:-1,body:19,h:8},{dir:1,body:17,h:8},{dir:-1,body:18,h:8}],
+ answer:1,explain:"Équilibre clair autour du POC, aucune confluence directionnelle. Le scénario le plus probable est la poursuite du range. La bonne décision : ne pas trader."},
+{ctx:"Le prix fait un <b>nouveau plus-bas</b> sous le VAL, mais le <b>delta diverge</b> (moins négatif que sur le creux précédent). De gros bids absorbent les ventes : le prix ne baisse plus malgré l'agression vendeuse.",
+ bars:[{dir:-1,body:40,h:8},{dir:-1,body:34,h:8},{dir:-1,body:26,h:10},{dir:-1,body:20,h:12},{dir:-1,body:16,h:14},{dir:1,body:14,h:10},{dir:1,body:20,h:8},{dir:1,body:28,h:8}],
+ answer:0,explain:"Divergence delta/prix + absorption au plus-bas = essoufflement vendeur et force acheteuse cachée. Retournement haussier probable. Classique de fin de mouvement."},
+{ctx:"Cassure du <b>VAL</b> vers le bas avec <b>delta très négatif</b>, sweep des bids sur plusieurs niveaux, et un LVN ouvert en dessous jusqu'au prochain HVN plus bas.",
+ bars:[{dir:-1,body:16,h:8},{dir:1,body:14,h:8},{dir:-1,body:22,h:8},{dir:-1,body:28,h:10},{dir:-1,body:36,h:8},{dir:-1,body:44,h:8},{dir:-1,body:52,h:10},{dir:-1,body:58,h:8}],
+ answer:2,explain:"Cassure de value area par le bas + delta négatif confirmant + sweep + LVN dégagé = vrai déséquilibre vendeur. Setup ORB short type, cible le HVN inférieur."},
+{ctx:"Forte hausse depuis l'ouverture. Sur la dernière bougie, <b>énorme delta positif</b> puis le tape <b>ralentit brutalement</b>, plus aucun nouvel acheteur, et de gros asks apparaissent (exhaustion).",
+ bars:[{dir:1,body:20,h:8},{dir:1,body:30,h:8},{dir:1,body:42,h:8},{dir:1,body:54,h:8},{dir:1,body:66,h:10},{dir:1,body:72,h:22},{dir:-1,body:60,h:14},{dir:-1,body:50,h:12}],
+ answer:2,explain:"Exhaustion : le pic d'agression sans suite + ralentissement du tape = le mouvement a brûlé ses munitions. Pas le moment d'acheter ; un pullback/retournement est probable."},
+{ctx:"Ouverture NY. Le range des 15 premières minutes est <b>très large (18 points)</b>. Le prix casse le haut, mais ton stop au côté opposé dépasserait 10 points et ta taille calculée serait minuscule.",
+ bars:[{dir:1,body:30,h:10},{dir:-1,body:28,h:18},{dir:1,body:34,h:16},{dir:-1,body:30,h:14},{dir:1,body:40,h:12},{dir:1,body:46,h:10},{dir:1,body:50,h:8},{dir:1,body:54,h:8}],
+ answer:1,explain:"Même si la cassure semble valide, le risque (stop > 10 pts) viole les règles de la stratégie. La bonne décision est de NE PAS prendre le trade : le money management prime sur le signal."},
+{ctx:"Le prix casse le VAH mais le <b>delta est plat</b> et juste après, un <b>iceberg</b> de vendeurs absorbe chaque tentative de hausse au même niveau. Le prix retombe sous le VAH (faux breakout).",
+ bars:[{dir:1,body:30,h:8},{dir:1,body:38,h:10},{dir:1,body:42,h:18},{dir:-1,body:40,h:14},{dir:-1,body:34,h:10},{dir:-1,body:28,h:8},{dir:-1,body:24,h:8},{dir:-1,body:20,h:8}],
+ answer:2,explain:"Cassure sans delta + absorption par iceberg = faux breakout. Le retour sous le VAH ouvre la voie à un mouvement baissier. Le delta plat était le signal d'alerte."}
+];
+
+/* ---- tool pages registry ---- */
+const TOOLS=[
+  {id:'calc',ic:'🧮',title:'Calculateurs',render:renderCalc},
+  {id:'journal',ic:'📓',title:'Journal de trading',render:renderJournal},
+  {id:'replay',ic:'🎮',title:'Trainer de lecture',render:renderReplay},
+  {id:'glossary',ic:'📖',title:'Glossaire',render:renderGlossary},
+  {id:'exam',ic:'🎓',title:'Examen final',render:renderExam},
+];
+
+/* ---- helpers ---- */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200)}
+function moduleCount(){return MODULES.length}
+function doneCount(){return MODULES.filter(m=>STATE.completed[m.id]).length}
+
+/* ---- sidebar ---- */
+function buildSidebar(){
+  const sb=$('#sidebar');
+  let h='<div class="navgroup">Parcours</div>';
+  MODULES.forEach(m=>{
+    const done=STATE.completed[m.id]?'done':'';
+    h+=`<div class="navlink ${done}" data-go="mod:${m.id}"><span class="ix">${m.num}</span><span>${m.title}</span></div>`;
+  });
+  h+='<div class="navgroup">Pratique &amp; outils</div>';
+  TOOLS.forEach(t=>{h+=`<div class="navlink" data-go="tool:${t.id}"><span class="ic">${t.ic}</span><span>${t.title}</span></div>`});
+  h+='<div class="navgroup">Système</div>';
+  h+=`<div class="navlink" data-go="home"><span class="ic">⟆</span><span>Accueil</span></div>`;
+  h+=`<div class="navlink" data-go="tool:reset"><span class="ic">↺</span><span>Réinitialiser ma progression</span></div>`;
+  sb.innerHTML=h;
+  $$('.navlink',sb).forEach(el=>el.onclick=()=>{go(el.dataset.go);closeSb()});
+}
+function markActive(key){
+  $$('.navlink').forEach(el=>el.classList.toggle('active',el.dataset.go===key));
+}
+function updateProgress(){
+  const d=doneCount(),t=moduleCount();
+  $('#progBar').style.width=t?(d/t*100)+'%':'0';
+  $('#progPct').textContent=`${d} / ${t} modules`;
+  $$('.navlink').forEach(el=>{const k=el.dataset.go||'';if(k.startsWith('mod:')){const id=k.slice(4);el.classList.toggle('done',!!STATE.completed[id])}});
+}
+
+/* ---- router ---- */
+function go(key){
+  if(key==='home')return renderHome(),markActive('home'),window.scrollTo(0,0);
+  if(key.startsWith('mod:')){const id=key.slice(4);renderModule(id);markActive(key);window.scrollTo(0,0);return}
+  if(key.startsWith('tool:')){
+    const id=key.slice(5);
+    if(id==='reset'){if(confirm('Effacer toute ta progression et ton journal ?')){STATE={completed:{},journal:[]};save();buildSidebar();updateProgress();go('home');toast('Progression réinitialisée')}return}
+    const t=TOOLS.find(x=>x.id===id);if(t){setMain(t.render());markActive(key);window.scrollTo(0,0)}
+    return;
+  }
+}
+function setMain(html){$('#main').innerHTML=`<div class="page show">${html}</div>`}
+
+/* ---- HOME ---- */
+function renderHome(){
+  const d=doneCount(),t=moduleCount();
+  const next=MODULES.find(m=>!STATE.completed[m.id])||MODULES[0];
+  setMain(`
+    <span class="kicker">Formation order flow · gratuite · données honnêtes</span>
+    <h1>Apprends à lire le marché là où il se décide. Et sors avec une stratégie rentable.</h1>
+    <p class="lead">${t} modules qui te mènent de zéro à trader order flow autonome : la théorie des enchères (AMT), le Volume Profile, le carnet d'ordres (DOM), le footprint et le delta, la confluence, puis une <strong>stratégie ES entièrement chiffrée</strong>, la gestion du risque, la psychologie et le passage en prop firm. Pas de promesse de gain facile — la méthode exacte qui sépare les 3 % qui survivent des 97 % qui échouent.</p>
+    <div class="row">
+      <button class="btn" onclick="go('mod:${next.id}')">${d===0?'Commencer le module 1':'Reprendre : '+next.title} →</button>
+      <button class="btn ghost" onclick="go('tool:replay')">🎮 Trainer de lecture</button>
+      <button class="btn ghost" onclick="go('tool:exam')">🎓 Examen final</button>
+    </div>
+    <div class="grid3" style="margin-top:26px">
+      <div class="stat"><div class="v">${t}</div><div class="l">modules denses</div></div>
+      <div class="stat"><div class="v">${d}/${t}</div><div class="l">complétés</div></div>
+      <div class="stat"><div class="v">31,8%</div><div class="l">win rate de la stratégie ES (rentable)</div></div>
+    </div>
+    <div class="hero-card" style="margin-top:26px">
+      <h3 style="margin-top:0">Ce que tu sauras faire à la fin</h3>
+      <div class="grid2">
+        <div>
+          <div class="feat"><span class="fi">🧠</span><div>Lire une enchère : équilibre, déséquilibre, valeur, rejet — sans indicateur.</div></div>
+          <div class="feat"><span class="fi">📊</span><div>Utiliser le Volume Profile (POC, VAH/VAL, HVN/LVN) pour situer le prix.</div></div>
+          <div class="feat"><span class="fi">🪜</span><div>Décoder le DOM, le tape et le delta : absorption, exhaustion, divergence.</div></div>
+        </div>
+        <div>
+          <div class="feat"><span class="fi">🎯</span><div>Exécuter une stratégie ES mécanique, à edge positif, avec règles écrites.</div></div>
+          <div class="feat"><span class="fi">🛡️</span><div>Gérer le risque comme un pro : sizing, R, espérance, trailing drawdown.</div></div>
+          <div class="feat"><span class="fi">🏦</span><div>Passer et tenir un compte prop firm (FTMO) sans le faire sauter.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="callout red" style="margin-top:24px"><b>⚠ À lire avant tout</b>Contenu éducatif, aucun conseil en investissement. Le trading à effet de levier est risqué et la <strong>majorité des particuliers perdent de l'argent</strong>. On apprend d'abord en démo, le risque toujours avant le profit. Cette formation t'apprend une méthode et une discipline — pas une garantie de gains.</div>
+  `);
+}
+
+/* ---- MODULE ---- */
+function renderModule(id){
+  const i=MODULES.findIndex(m=>m.id===id);if(i<0)return;
+  const m=MODULES[i];const prev=MODULES[i-1],nxt=MODULES[i+1];
+  const done=STATE.completed[id];
+  let h=`<span class="kicker">Module ${m.num}</span><h1>${m.title}</h1>`;
+  if(m.subtitle)h+=`<p class="lead">${m.subtitle}</p>`;
+  h+=`<div class="modbody">${m.html}</div>`;
+  if(m.quiz&&m.quiz.length){
+    h+=`<h2>✓ Quiz — valide ta compréhension</h2><p class="muted">Réponds correctement pour valider le module. Chaque réponse est expliquée.</p><div class="quiz" id="quiz"></div>`;
+  }
+  h+=`<div class="modfoot">
+        <div>${prev?`<button class="btn ghost" onclick="go('mod:${prev.id}')">← ${prev.title}</button>`:''}</div>
+        <div id="modStatus">${done?'<span class="badge-done">✓ Module validé</span>':''}</div>
+        <div>${nxt?`<button class="btn" onclick="go('mod:${nxt.id}')">${nxt.title} →</button>`:`<button class="btn" onclick="go('tool:exam')">Passer l'examen 🎓</button>`}</div>
+      </div>`;
+  setMain(h);
+  if(m.quiz&&m.quiz.length)mountQuiz(m);
+}
+function mountQuiz(m){
+  const root=$('#quiz');let answered=new Array(m.quiz.length).fill(false);
+  m.quiz.forEach((q,qi)=>{
+    const el=document.createElement('div');el.className='q';
+    el.innerHTML=`<div class="qt">${qi+1}. ${q.q}</div>`+q.options.map((o,oi)=>`<button class="opt" data-oi="${oi}">${o}</button>`).join('')+`<div class="explain">${q.explain||''}</div>`;
+    root.appendChild(el);
+    $$('.opt',el).forEach(b=>b.onclick=()=>{
+      if(answered[qi])return;answered[qi]=true;
+      const oi=+b.dataset.oi;const ok=oi===q.answer;
+      $$('.opt',el).forEach((x,xi)=>{x.classList.add('dim');if(xi===q.answer)x.classList.add('correct');});
+      if(!ok)b.classList.add('wrong');b.classList.remove('dim');
+      $('.explain',el).classList.add('show');
+      if(answered.every(Boolean))completeModule(m);
+    });
+  });
+}
+function completeModule(m){
+  if(!STATE.completed[m.id]){STATE.completed[m.id]=true;save();updateProgress();buildSidebar();updateProgress();toast('✓ Module validé : '+m.title)}
+  const s=$('#modStatus');if(s)s.innerHTML='<span class="badge-done">✓ Module validé</span>';
+}
+
+/* ===== TOOLS ===== */
+function num(v){v=parseFloat(String(v).replace(',','.'));return isNaN(v)?0:v}
+function renderCalc(){
+  return `<span class="kicker">Outils</span><h1>Calculateurs</h1><p class="lead">Le risque AVANT le profit, toujours. Ces trois outils font 90 % du money management.</p>
+  <div class="card"><h3 style="margin-top:0">1 · Taille de position</h3><p class="muted">Le risque détermine la taille — jamais l'inverse.</p>
+    <div class="grid2">
+      <div class="field"><label>Capital (€)</label><input id="c_cap" value="100000"></div>
+      <div class="field"><label>Risque par trade (%)</label><input id="c_rsk" value="0.5"></div>
+      <div class="field"><label>Distance au stop (points)</label><input id="c_stp" value="8"></div>
+      <div class="field"><label>Instrument</label><select id="c_ins"><option value="5">MES (5 €/pt)</option><option value="50" selected>ES (50 €/pt)</option><option value="20">NQ (20 €/pt)</option><option value="2">MNQ (2 €/pt)</option></select></div>
+    </div>
+    <div class="row"><button class="btn" onclick="doPos()">Calculer</button><div id="c_out" class="stat" style="flex:1;min-width:200px">—</div></div>
+  </div>
+  <div class="card"><h3 style="margin-top:0">2 · Espérance &amp; simulation de 200 trades</h3><p class="muted">Vois pourquoi un faible win rate peut être très rentable — et vis les séries de pertes.</p>
+    <div class="grid3">
+      <div class="field"><label>Taux de réussite (%)</label><input id="e_wr" value="32"></div>
+      <div class="field"><label>Gain moyen (R)</label><input id="e_gw" value="2.4"></div>
+      <div class="field"><label>Perte moyenne (R)</label><input id="e_gl" value="1"></div>
+    </div>
+    <div class="row"><button class="btn" onclick="doExp()">Simuler</button><div id="e_out" class="stat" style="flex:1;min-width:200px">—</div></div>
+    <div class="fig" id="e_fig" style="display:none"><svg id="e_svg" viewBox="0 0 760 220"></svg><div class="cap">Courbe d'equity simulée (200 trades, en R). Relance pour voir d'autres séquences.</div></div>
+  </div>
+  <div class="card"><h3 style="margin-top:0">3 · Trailing drawdown (prop firm)</h3><p class="muted">Comprends pourquoi le seuil suit ton plus haut — et où le compte saute.</p>
+    <div class="grid3">
+      <div class="field"><label>Solde de départ (€)</label><input id="d_bal" value="100000"></div>
+      <div class="field"><label>Trailing drawdown (€)</label><input id="d_dd" value="3000"></div>
+      <div class="field"><label>Plus haut d'equity atteint (€)</label><input id="d_hi" value="102000"></div>
+    </div>
+    <div class="row"><button class="btn" onclick="doDD()">Calculer</button><div id="d_out" class="stat" style="flex:1;min-width:200px">—</div></div>
+  </div>
+  <div class="callout">Astuce : sur la stratégie ES de la formation, le drawdown réel observé (~2 738 $) passe confortablement sur un FTMO 100K à 200 $/trade, mais ferait sauter un Topstep 50K à 100 $/trade. Le sizing doit toujours respecter le trailing.</div>`;
+}
+function doPos(){const cap=num($('#c_cap').value),rsk=num($('#c_rsk').value),stp=num($('#c_stp').value),pv=num($('#c_ins').value);
+  const riskE=cap*rsk/100;const perContract=stp*pv;const n=perContract>0?riskE/perContract:0;
+  $('#c_out').innerHTML=`<div class="v">${n.toFixed(2)} contrats</div><div class="l">Risque = ${riskE.toFixed(0)} € · ${perContract.toFixed(0)} €/contrat au stop</div>`;}
+function doExp(){const wr=num($('#e_wr').value)/100,gw=num($('#e_gw').value),gl=num($('#e_gl').value);
+  const exp=wr*gw-(1-wr)*gl;
+  let eq=0,peak=0,maxdd=0,pts=[];for(let i=0;i<200;i++){eq+=Math.random()<wr?gw:-gl;peak=Math.max(peak,eq);maxdd=Math.min(maxdd,eq-peak);pts.push(eq)}
+  $('#e_out').innerHTML=`<div class="v" style="color:${exp>=0?'var(--grn)':'var(--red)'}">${exp>=0?'+':''}${exp.toFixed(3)} R / trade</div><div class="l">Sur 200 trades simulés : ${pts[199].toFixed(1)} R cumulés · pire drawdown ${maxdd.toFixed(1)} R</div>`;
+  drawEquity(pts);}
+function drawEquity(pts){const svg=$('#e_svg');$('#e_fig').style.display='';const W=760,H=220,pad=24;const mn=Math.min(...pts,0),mx=Math.max(...pts,0);const sx=(W-2*pad)/(pts.length-1);const sy=(H-2*pad)/((mx-mn)||1);
+  const path=pts.map((v,i)=>`${i?'L':'M'}${(pad+i*sx).toFixed(1)},${(H-pad-(v-mn)*sy).toFixed(1)}`).join(' ');
+  const zero=H-pad-(0-mn)*sy;
+  svg.innerHTML=`<line x1="${pad}" y1="${zero}" x2="${W-pad}" y2="${zero}" stroke="rgba(255,255,255,.15)" stroke-dasharray="4 4"/><path d="${path}" fill="none" stroke="${pts[pts.length-1]>=0?'#34D399':'#FB7185'}" stroke-width="2"/>`;}
+function doDD(){const bal=num($('#d_bal').value),dd=num($('#d_dd').value),hi=num($('#d_hi').value);
+  const floor=Math.max(bal,hi)-dd;const room=Math.max(hi,bal)-floor;
+  $('#d_out').innerHTML=`<div class="v">Seuil à ${floor.toFixed(0)} €</div><div class="l">Le compte saute si l'equity touche ${floor.toFixed(0)} €. Marge actuelle depuis le plus haut : ${dd.toFixed(0)} €.</div>`;}
+
+/* ---- JOURNAL ---- */
+function renderJournal(){
+  setTimeout(drawJournal,0);
+  return `<span class="kicker">Outils</span><h1>Journal de trading</h1><p class="lead">Saisis tes trades en R. Le journal calcule ton win rate, ton espérance, ta discipline et ta distribution. Sauvegardé sur ton navigateur.</p>
+  <div class="card">
+    <div class="row">
+      <div class="field" style="flex:1"><label>Résultat (R) — ex : 2.4 ou -1</label><input id="j_r" placeholder="2.4"></div>
+      <div class="field" style="flex:1"><label>Exécution</label><select id="j_p"><option value="1">Plan respecté ✓</option><option value="0">Hors plan ✗</option></select></div>
+      <div class="field" style="flex:2"><label>Note (optionnel)</label><input id="j_n" placeholder="Cassure ORB + delta confirmé…"></div>
+      <button class="btn" onclick="addTrade()" style="align-self:end">Ajouter</button>
+    </div>
+  </div>
+  <div id="j_stats" class="grid3"></div>
+  <div class="fig" id="j_fig" style="display:none"><svg id="j_svg" viewBox="0 0 760 220"></svg><div class="cap">Courbe d'equity de tes trades (R cumulés).</div></div>
+  <div class="card"><h3 style="margin-top:0">Historique</h3><div id="j_list"></div></div>
+  <div class="callout grn"><b>La métrique qui prédit la rentabilité</b>Vise &gt; 90 % de trades « plan respecté ». Un perdant <em>bien exécuté</em> est une bonne décision. Le résultat d'un trade isolé ne veut rien dire ; l'espérance sur 100+ trades, si.</div>`;
+}
+function addTrade(){const r=num($('#j_r').value);if($('#j_r').value.trim()===''){toast('Entre un résultat en R');return}
+  STATE.journal.push({r,p:+$('#j_p').value,n:$('#j_n').value.trim(),t:Date.now()});save();$('#j_r').value='';$('#j_n').value='';drawJournal();toast('Trade ajouté')}
+function delTrade(i){STATE.journal.splice(i,1);save();drawJournal()}
+function drawJournal(){const J=STATE.journal;const wins=J.filter(x=>x.r>0).length,los=J.filter(x=>x.r<=0).length;
+  const wr=J.length?wins/J.length*100:0;const sumW=J.filter(x=>x.r>0).reduce((a,b)=>a+b.r,0);const sumL=J.filter(x=>x.r<=0).reduce((a,b)=>a+b.r,0);
+  const avgW=wins?sumW/wins:0,avgL=los?Math.abs(sumL/los):0;const exp=J.length?(sumW+sumL)/J.length:0;
+  const plan=J.length?J.filter(x=>x.p).length/J.length*100:0;const tot=J.reduce((a,b)=>a+b.r,0);
+  const st=$('#j_stats');if(st)st.innerHTML=`
+    <div class="stat"><div class="v">${J.length}</div><div class="l">trades</div></div>
+    <div class="stat"><div class="v">${wr.toFixed(0)}%</div><div class="l">win rate</div></div>
+    <div class="stat"><div class="v" style="color:${exp>=0?'var(--grn)':'var(--red)'}">${exp>=0?'+':''}${exp.toFixed(2)} R</div><div class="l">espérance / trade</div></div>
+    <div class="stat"><div class="v">${avgW.toFixed(2)}R / ${avgL.toFixed(2)}R</div><div class="l">gain moy / perte moy</div></div>
+    <div class="stat"><div class="v" style="color:${plan>=90?'var(--grn)':'var(--gold)'}">${plan.toFixed(0)}%</div><div class="l">plan respecté</div></div>
+    <div class="stat"><div class="v" style="color:${tot>=0?'var(--grn)':'var(--red)'}">${tot>=0?'+':''}${tot.toFixed(1)} R</div><div class="l">total cumulé</div></div>`;
+  // equity
+  if(J.length){let eq=0;const pts=J.map(x=>eq+=x.r);drawEq('#j_svg','#j_fig',pts)}else{const f=$('#j_fig');if(f)f.style.display='none'}
+  const list=$('#j_list');if(list)list.innerHTML=J.length?J.slice().reverse().map((x,ri)=>{const i=J.length-1-ri;return `<div class="row" style="margin:6px 0;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:6px"><div><b style="color:${x.r>0?'var(--grn)':'var(--red)'}">${x.r>0?'+':''}${x.r}R</b> &nbsp;${x.p?'<span style="color:var(--grn)">plan ✓</span>':'<span style="color:var(--red)">hors plan ✗</span>'} &nbsp;<span class="muted">${x.n||''}</span></div><button class="opt" style="width:auto;margin:0;padding:4px 10px" onclick="delTrade(${i})">✕</button></div>`}).join(''):'<p class="muted">Aucun trade encore. Ajoute ton premier trade en démo ci-dessus.</p>';
+}
+function drawEq(svgSel,figSel,pts){const svg=$(svgSel);$(figSel).style.display='';const W=760,H=220,pad=24;const mn=Math.min(...pts,0),mx=Math.max(...pts,0);const sx=(W-2*pad)/Math.max(1,(pts.length-1));const sy=(H-2*pad)/((mx-mn)||1);
+  const path=pts.map((v,i)=>`${i?'L':'M'}${(pad+i*sx).toFixed(1)},${(H-pad-(v-mn)*sy).toFixed(1)}`).join(' ');const zero=H-pad-(0-mn)*sy;
+  svg.innerHTML=`<line x1="${pad}" y1="${zero}" x2="${W-pad}" y2="${zero}" stroke="rgba(255,255,255,.15)" stroke-dasharray="4 4"/><path d="${path}" fill="none" stroke="${pts[pts.length-1]>=0?'#34D399':'#FB7185'}" stroke-width="2"/>`;}
+
+/* ---- REPLAY TRAINER ---- */
+let RP={i:0,score:0,answered:false};
+function renderReplay(){RP={i:0,score:0,answered:false};setTimeout(paintScenario,0);
+  return `<span class="kicker">Pratique</span><h1>Trainer de lecture directionnelle</h1><p class="lead">Des scénarios d'order flow réalistes. Lis le contexte (Volume Profile, delta, DOM), prédis le prochain mouvement, puis compare à la lecture du pro. Vise &gt; 60 % avant de passer en démo.</p>
+  <div class="rp-stage">
+    <div id="rp_ctx"></div>
+    <div class="bars" id="rp_bars"></div>
+    <div id="rp_q" style="margin-top:14px"></div>
+    <div id="rp_ex" class="explain" style="margin-top:12px"></div>
+    <div class="row" style="justify-content:space-between"><div class="muted" id="rp_score">Score : 0 / 0</div><button class="btn ghost" id="rp_next" onclick="rpNext()" style="display:none">Scénario suivant →</button></div>
+  </div>`;
+}
+function paintScenario(){
+  const s=SCENARIOS[RP.i];if(!s){return finishReplay()}
+  RP.answered=false;
+  $('#rp_ctx').innerHTML=`<div class="callout"><b>Contexte — scénario ${RP.i+1}/${SCENARIOS.length}</b>${s.ctx}</div>`;
+  // bars
+  const bars=$('#rp_bars');const max=Math.max(...s.bars.map(b=>b.h+Math.abs(b.o)));bars.innerHTML=s.bars.map(b=>{
+    const up=b.dir>=0;const col=up?'#34D399':'#FB7185';const bodyH=Math.max(3,b.body);const wickH=b.h;
+    return `<div class="b"><div class="wick" style="height:${wickH}px"></div><div class="body" style="height:${bodyH}px;background:${col}"></div></div>`;
+  }).join('');
+  $('#rp_q').innerHTML=`<div class="qt" style="font-weight:600;margin-bottom:8px">Dans les prochaines barres, le prix va plutôt…</div>`+
+    ['↑ Monter','→ Stagner / range','↓ Descendre'].map((t,i)=>`<button class="opt" onclick="rpAns(${i})" data-i="${i}">${t}</button>`).join('');
+  $('#rp_ex').classList.remove('show');$('#rp_ex').innerHTML='';$('#rp_next').style.display='none';
+  $('#rp_score').textContent=`Score : ${RP.score} / ${RP.i}`;
+}
+function rpAns(i){if(RP.answered)return;RP.answered=true;const s=SCENARIOS[RP.i];const ok=i===s.answer;if(ok)RP.score++;
+  $$('#rp_q .opt').forEach((b,bi)=>{b.classList.add('dim');if(bi===s.answer)b.classList.add('correct');if(bi===i&&!ok)b.classList.add('wrong')});
+  const ex=$('#rp_ex');ex.innerHTML=`<b style="color:${ok?'var(--grn)':'var(--red)'}">${ok?'✓ Bonne lecture':'✗ Lecture à revoir'}.</b> ${s.explain}`;ex.classList.add('show');
+  $('#rp_next').style.display='';$('#rp_score').textContent=`Score : ${RP.score} / ${RP.i+1}`;
+}
+function rpNext(){RP.i++;paintScenario()}
+function finishReplay(){const pct=Math.round(RP.score/SCENARIOS.length*100);
+  setMain(`<span class="kicker">Pratique</span><h1>Trainer terminé</h1>
+   <div class="cert"><div class="seal">${pct>=60?'🎯':'📉'}</div><h2>${RP.score} / ${SCENARIOS.length} — ${pct}%</h2>
+   <p>${pct>=60?'Solide. Ta lecture directionnelle est exploitable en démo. Continue à tracker ton win rate de lecture dans le journal.':'Encore en dessous de 60 %. Reprends les modules Volume Profile, delta et confluence, puis recommence — l\'objectif est de ressentir le déséquilibre, pas de deviner.'}</p>
+   <div class="row" style="justify-content:center"><button class="btn" onclick="go('tool:replay')">↺ Recommencer</button><button class="btn ghost" onclick="go('mod:${MODULES[0]?MODULES[0].id:''}')">Revoir les modules</button></div></div>`);
+}
+
+/* ---- GLOSSARY ---- */
+function renderGlossary(){
+  const rows=GLOSSARY.map(g=>`<tr><td style="white-space:nowrap"><strong>${g.t}</strong></td><td>${g.d}</td></tr>`).join('');
+  return `<span class="kicker">Outils</span><h1>Glossaire</h1><p class="lead">Tous les termes essentiels de l'order flow, en clair.</p><div class="card" style="padding:6px 10px"><table>${rows}</table></div>`;
+}
+
+/* ---- EXAM ---- */
+let EX={qs:[],i:0,ans:[]};
+function renderExam(){
+  // need all modules done? recommend but allow
+  const ready=doneCount()>=Math.ceil(moduleCount()*0.6);
+  return `<span class="kicker">Certification</span><h1>Examen final</h1>
+  <p class="lead">20 questions tirées de l'ensemble du parcours, mélangées. Il faut <strong>80 %</strong> pour obtenir le certificat. Tu peux le repasser autant de fois que nécessaire.</p>
+  ${ready?'':'<div class="callout gold"><b>Conseil</b>Tu n\'as pas encore validé la majorité des modules. Tu peux tenter l\'examen, mais il vaut mieux finir le parcours d\'abord.</div>'}
+  <div class="row"><button class="btn" onclick="startExam()">Démarrer l'examen</button></div>
+  <div id="ex_area"></div>`;
+}
+function startExam(){
+  const pool=EXAM_POOL.slice();for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
+  EX={qs:pool.slice(0,Math.min(20,pool.length)),i:0,ans:[]};paintExam();
+}
+function paintExam(){
+  if(EX.i>=EX.qs.length)return scoreExam();
+  const q=EX.qs[EX.i];
+  $('#ex_area').innerHTML=`<div class="q"><div class="qt">Question ${EX.i+1} / ${EX.qs.length}</div><div style="margin:6px 0 10px">${q.q}</div>
+   ${q.options.map((o,i)=>`<button class="opt" onclick="exAns(${i})">${o}</button>`).join('')}</div>
+   <div class="muted">Score en cours : ${EX.ans.filter((a,k)=>a===EX.qs[k].answer).length} / ${EX.i}</div>`;
+  window.scrollTo(0,document.body.scrollHeight);
+}
+function exAns(i){EX.ans.push(i);EX.i++;paintExam()}
+function scoreExam(){
+  const good=EX.ans.filter((a,k)=>a===EX.qs[k].answer).length;const pct=Math.round(good/EX.qs.length*100);const pass=pct>=80;
+  if(pass){STATE.examPassed=true;STATE.examPct=pct;save()}
+  let cert='';
+  if(pass){
+    const nm=STATE.name||prompt('Bravo 🎉 Quel nom mettre sur le certificat ?')||'Trader';STATE.name=nm;save();
+    cert=`<div class="cert"><div class="seal">🎓</div><div class="kicker">Certificat de réussite</div><h2 style="margin:10px 0 0">Orderflow Academy</h2><div class="name">${nm}</div><p>a complété la formation order flow et réussi l'examen avec <strong>${pct}%</strong>.</p><p class="muted">Prochaine étape : 90 jours en démo/sim, journal tenu, &gt; 90 % de plan respecté, avant tout euro réel.</p></div>`;
+  }
+  $('#ex_area').innerHTML=`<div class="card" style="text-align:center"><h2 style="margin-top:0">${good} / ${EX.qs.length} — ${pct}%</h2>
+   <p style="color:${pass?'var(--grn)':'var(--red)'};font-weight:700">${pass?'✓ Réussi — certificat débloqué':'✗ Pas encore (80 % requis)'}</p>
+   <div class="row" style="justify-content:center"><button class="btn" onclick="startExam()">↺ Repasser</button><button class="btn ghost" onclick="go('home')">Accueil</button></div></div>${cert}`;
+  window.scrollTo(0,0);
+}
+
+/* ---- mobile sidebar ---- */
+function openSb(){$('#sidebar').classList.add('open');$('#scrim').classList.add('show')}
+function closeSb(){$('#sidebar').classList.remove('open');$('#scrim').classList.remove('show')}
+$('#burger').onclick=openSb;$('#scrim').onclick=closeSb;
+
+/* ---- init ---- */
+function init(){buildSidebar();updateProgress();renderHome();markActive('home');}
+init();
+</script>
+</body></html>
